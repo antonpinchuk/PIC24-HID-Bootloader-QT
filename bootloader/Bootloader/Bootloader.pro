@@ -29,9 +29,9 @@ OTHER_FILES += windows.rc
 # Add the correct HIDAPI library according to what
 # OS is being used
 #-------------------------------------------------
-win32: LIBS += -L../HIDAPI/windows
-macx: LIBS += -L../HIDAPI/mac
-unix: !macx: LIBS += -L../HIDAPI/linux
+win32: LIBS += -L../../common/HIDAPI/windows
+macx: LIBS += -L../../common/HIDAPI/mac
+unix: !macx: LIBS += -L../../common/HIDAPI/linux
 LIBS += -lHIDAPI
 
 #-------------------------------------------------
