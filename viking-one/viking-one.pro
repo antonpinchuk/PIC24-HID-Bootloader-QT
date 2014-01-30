@@ -15,6 +15,7 @@ TEMPLATE = app
 
 DEFINES += APPLICATION_VERSION=\"\\\"$$VERSION\\\"\"
 
+INCLUDEPATH += ../
 HEADERS += \
     mainwindow.h \
     updatescheduler.h \

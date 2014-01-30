@@ -35,10 +35,11 @@
 #include <QtWidgets/QMenu>
 #include <QFuture>
 
-#include "Comm.h"
-#include "DeviceData.h"
-#include "Device.h"
-#include "ImportExportHex.h"
+#include "HIDBootloader/Bootloader.h"
+#include "HIDBootloader/Comm.h"
+#include "HIDBootloader/DeviceData.h"
+#include "HIDBootloader/Device.h"
+#include "HIDBootloader/ImportExportHex.h"
 
 namespace Ui
 {

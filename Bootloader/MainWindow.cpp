@@ -47,8 +47,7 @@
 
 #include "Settings.h"
 
-#include "../version.h"
-
+#include "version.h"
 
 
 
