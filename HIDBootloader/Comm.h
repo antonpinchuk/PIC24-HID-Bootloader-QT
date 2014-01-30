@@ -34,7 +34,7 @@
 #include <QThread>
 #include <QTimer>
 
-#include "../common/HIDAPI/hidapi.h"
+#include "../HIDAPI/hidapi.h"
 #include "Device.h"
 
 // Device Vendor and Product IDs
