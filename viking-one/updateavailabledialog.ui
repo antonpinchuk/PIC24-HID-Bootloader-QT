@@ -11,7 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>New version available</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/new/ico/app.ico</normaloff>:/new/ico/app.ico</iconset>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <widget class="QPushButton" name="UpdateNowBtn">
    <property name="enabled">
@@ -75,18 +82,17 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>10</pointsize>
     </font>
    </property>
-   <property name="locale">
-    <locale language="English" country="UnitedStates"/>
-   </property>
    <property name="text">
-    <string>New Update Available!</string>
+    <string> Would you like to download and install new version?</string>
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>RemindMeLaterBtn</sender>
