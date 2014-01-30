@@ -8,21 +8,29 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     updateAvailableDialog = new UpdateAvailableDialog(this);
+    UpdateScheduler       = new TUpdateScheduler(this);
+    SystemTrayMenu        = new QMenu("tray menu");
+
+    QAction* checkUpdateAction = SystemTrayMenu->addAction("check update");
+    QAction* quitAction        = SystemTrayMenu->addAction("quit");
+
+    connect(quitAction       , SIGNAL(triggered()), this, SLOT(Exit()) );
+    connect(checkUpdateAction, SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
 
     Ico = new QSystemTrayIcon(this);
     Ico->setIcon(QIcon(":/new/ico/app.ico"));
+    Ico->setContextMenu(SystemTrayMenu);
     Ico->show();
-
-    UpdateScheduler = new TUpdateScheduler(this);
 
     connect(Ico , SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT  (TrayIcoClick(QSystemTrayIcon::ActivationReason)) );
 
 
+
     connect( ui->CheckVersionBtn , SIGNAL(clicked()), UpdateScheduler, SLOT(CheckUpdate()) );
     connect( UpdateScheduler, SIGNAL(NeedUpdate(QString,QString)), this, SLOT(NeedUpdate(QString,QString)) );
 
-    // ui->CheckVersionBtn->setVisible(false);
+    ui->CheckVersionBtn->setVisible(false);
 }
 //------------------------------------------------------------------------------------------------------------//
 MainWindow::~MainWindow()
@@ -31,6 +39,7 @@ MainWindow::~MainWindow()
     delete Ico;
     delete UpdateScheduler;
     delete updateAvailableDialog;
+    delete SystemTrayMenu;
 }
 //------------------------------------------------------------------------------------------------------------//
 void MainWindow::changeEvent( QEvent * event )
@@ -48,7 +57,10 @@ void MainWindow::changeEvent( QEvent * event )
 void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
 {
     if(Reason == QSystemTrayIcon::Trigger){
-        if(this->isHidden()){
+        if(!this->isHidden()){
+            this->hide();
+        }
+        else{
             this->showNormal();
             this->activateWindow();
         }
@@ -58,5 +70,10 @@ void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
 void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
 {
     updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
+}
+//------------------------------------------------------------------------------------------------------------//
+void MainWindow::Exit()
+{
+    QCoreApplication::exit();
 }
 //------------------------------------------------------------------------------------------------------------//

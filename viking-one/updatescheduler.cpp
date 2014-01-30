@@ -1,6 +1,7 @@
 #include "updatescheduler.h"
 //------------------------------------------------------------------------------------------------------------//
-TUpdateScheduler::TUpdateScheduler(QObject *parent) : QObject(parent) {
+TUpdateScheduler::TUpdateScheduler(QObject *parent) : QObject(parent)
+{
     UpdateJsonUrl = "http://www.viking360.com/downloads/xbox-one/berserker/version";
 
     WebCtrl = new QNetworkAccessManager;
