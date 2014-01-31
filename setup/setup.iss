@@ -23,3 +23,14 @@ AppVersion=0.0.1.1401301400
 DefaultDirName={pf}\viking-one\
 OutputBaseFilename=viking-one-setup
 AllowRootDirectory=True
+
+[Tasks]
+Name: desktopicon;       Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}
+Name: quicklaunchicon;   Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
+Name: autorunicon;       Description: Run automatically at log on; GroupDescription: {cm:AdditionalIcons}
+
+[CustomMessages]
+
+[Run]
+
+[Code]

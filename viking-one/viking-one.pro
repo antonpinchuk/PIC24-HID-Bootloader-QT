@@ -19,23 +19,13 @@ INCLUDEPATH += ../
 HEADERS += \
     mainwindow.h \
     updatescheduler.h \
-    updateavailabledialog.h \
-    ../HIDBootloader/Bootloader.h \
-    ../HIDBootloader/Comm.h \
-    ../HIDBootloader/DeviceData.h \
-    ../HIDBootloader/Device.h \
-    ../HIDBootloader/ImportExportHex.h
+    updateavailabledialog.h
 
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
     updatescheduler.cpp \
-    updateavailabledialog.cpp \
-    ../HIDBootloader/Bootloader.cpp \
-    ../HIDBootloader/Comm.cpp \
-    ../HIDBootloader/DeviceData.cpp \
-    ../HIDBootloader/Device.cpp \
-    ../HIDBootloader/ImportExportHex.cpp
+    updateavailabledialog.cpp
 
 FORMS += \
     mainwindow.ui \
@@ -50,10 +40,10 @@ RESOURCES += \
 # Add the correct HIDAPI library according to what
 # OS is being used
 #-------------------------------------------------
-win32: LIBS += -L../HIDAPI/windows
-macx: LIBS += -L../HIDAPI/mac
-unix: !macx: LIBS += -L../HIDAPI/linux
-LIBS += -lHIDAPI
+#win32: LIBS += -L../HIDAPI/windows
+#macx: LIBS += -L../HIDAPI/mac
+#unix: !macx: LIBS += -L../HIDAPI/linux
+#LIBS += -lHIDAPI
 
 #-------------------------------------------------
 # Make sure to add the required libraries or
