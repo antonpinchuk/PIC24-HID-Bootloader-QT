@@ -38,7 +38,7 @@
    <string>Viking update downloader</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res.qrc">
+   <iconset resource="../viking-one/res.qrc">
     <normaloff>:/new/ico/app.ico</normaloff>:/new/ico/app.ico</iconset>
   </property>
   <property name="locale">
@@ -60,15 +60,21 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
     <property name="value">
      <number>0</number>
+    </property>
+    <property name="format">
+     <string>%p%</string>
     </property>
    </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../viking-one/res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -9,15 +9,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     WebCtrl = new QNetworkAccessManager(this);
 
+    FileUrl = "http://www.viking360.com/downloads/xbox-one/berserker/file";
     if(QApplication::arguments().size() > 1){
-        // FileUrl = "http://www.viking360.com/downloads/xbox-one/berserker/updates/test.1.0.0.1401211601.png";
         FileUrl = QApplication::arguments().at(1);
-
-        QNetworkRequest Request(FileUrl);
-        QNetworkReply* CurrDownload = WebCtrl->get(Request);
-        connect(CurrDownload, SIGNAL(downloadProgress(qint64 ,qint64)), this, SLOT(DownloadProgress(qint64, qint64)));
-        connect(WebCtrl     , SIGNAL(finished(QNetworkReply*))        , this, SLOT(FileDownloaded(QNetworkReply*)));
     }
+
+    QNetworkRequest Request(FileUrl);
+    QNetworkReply* CurrDownload = WebCtrl->get(Request);
+    connect(CurrDownload, SIGNAL(downloadProgress(qint64 ,qint64)), this, SLOT(DownloadProgress(qint64, qint64)));
+    connect(WebCtrl     , SIGNAL(finished(QNetworkReply*))        , this, SLOT(FileDownloaded(QNetworkReply*)));
 }
 
 MainWindow::~MainWindow()
@@ -28,9 +28,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal )
 {
-    float DownloadedVal = (float)bytesTotal/(float)bytesReceived;
-
-    ui->DownloadProgressBar->setValue(DownloadedVal*100);
+    ui->DownloadProgressBar->setValue( (100.0/bytesTotal)*(double)bytesReceived );
 }
 
 void MainWindow::FileDownloaded(QNetworkReply* Reply)
@@ -43,16 +41,29 @@ void MainWindow::FileDownloaded(QNetworkReply* Reply)
     DownloadedData = Reply->readAll();
     Reply->deleteLater();
 
-    QFileInfo FileInf(FileUrl);
-    QString FileName = FileInf.fileName();
 
-    QFile File("updates/" + FileName);
+    // QFileInfo FileInf(FileUrl);
+    // QString FileName = FileInf.fileName();
+
+    QString FileName = "viking-one-setup.exe";
+
+    // add update catalog to user folder
+    QDir Dir;
+    QString QUserUpdatesDir = Dir.homePath() + "/viking-one";
+    if(!Dir.exists(QUserUpdatesDir)){ Dir.mkdir(QUserUpdatesDir); }
+
+    QUserUpdatesDir += "/updates";
+    if(!Dir.exists(QUserUpdatesDir)){ Dir.mkdir(QUserUpdatesDir); }
+
+    QUserUpdatesDir += "/";
+
+
+    QFile File(QUserUpdatesDir + FileName );
     File.open(QIODevice::WriteOnly);
     File.write(DownloadedData);
     File.close();
 
-    QString AppPath = QCoreApplication::applicationDirPath();
-    QProcess::startDetached(AppPath + "updates/" + FileName);
+    QProcess::startDetached(QUserUpdatesDir + FileName);
 
     this->close();
     QCoreApplication::exit();

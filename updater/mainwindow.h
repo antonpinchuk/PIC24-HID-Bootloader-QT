@@ -11,6 +11,7 @@
 #include <QNetworkReply>
 #include <QFileInfo>
 #include <QProcess>
+#include <QDir>
 
 namespace Ui {
 class MainWindow;

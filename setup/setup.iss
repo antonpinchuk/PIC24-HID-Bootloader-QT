@@ -1,5 +1,4 @@
 [Dirs]
-Name: "{app}\platforms"
 Name: "{app}\updates"
 
 [Files]
@@ -23,14 +22,17 @@ AppVersion=0.0.1.1401301400
 DefaultDirName={pf}\viking-one\
 OutputBaseFilename=viking-one-setup
 AllowRootDirectory=True
+DefaultGroupName=Berserker Modded Controller
 
 [Tasks]
-Name: desktopicon;       Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}
-Name: quicklaunchicon;   Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
-Name: autorunicon;       Description: Run automatically at log on; GroupDescription: {cm:AdditionalIcons}
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "autorunicon"; Description: "Run automatically at log on"; GroupDescription: "{cm:AdditionalIcons}"
 
-[CustomMessages]
+[Icons]
+Name: "{group}\viking one"; Filename: "{app}\viking-one.exe"; WorkingDir: "{app}"; IconFilename: "{app}\app.ico"; IconIndex: 0
+Name: "{group}\Uninstall viking one"; Filename: "{uninstallexe}"
+Name: "{commondesktop}\viking one"; Filename: "{app}\viking-one.exe"; IconFilename: "{app}\app.ico"; IconIndex: 0; Tasks: desktopicon 
+Name: "{commonstartup}\viking one"; Filename: "{app}\viking-one.exe"; IconFilename: "{app}\app.ico"; IconIndex: 0; Tasks: autorunicon 
 
 [Run]
-
-[Code]
+Filename: "{app}\viking-one.exe"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
