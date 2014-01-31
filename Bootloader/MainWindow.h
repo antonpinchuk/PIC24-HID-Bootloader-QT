@@ -69,17 +69,11 @@ public:
     void setBootloadBusy(bool busy);
 
 signals:
-    void IoWithDeviceCompleted(QString msg, Comm::ErrorCode, double time);
-    void IoWithDeviceStarted(QString msg);
     void AppendString(QString msg);
     void SetProgressBar(int newValue);
 
 public slots:
-    void Connection(void);
     void openRecentFile(void);
-    void IoWithDeviceComplete(QString msg, Comm::ErrorCode, double time);
-    void IoWithDeviceStart(QString msg);
-    void AppendStringToTextbox(QString msg);
     void UpdateProgressBar(int newValue);
 
 protected:

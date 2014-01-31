@@ -55,21 +55,14 @@
 //Value used for error checking device reponse values.
 #define MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE 0x0FFFFFFF
 
-bool deviceFirmwareIsAtLeast101 = false;
-Comm::ExtendedQueryInfo extendedBootInfo;
-
-void MainWindow::writeLog(QString value){
+void MainWindow::writeLog(QString value) {
     ui->plainTextEdit->setPlainText(value);
 }
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindowClass)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindowClass) {
     mBootloader = new Bootloader();
     connect(mBootloader, SIGNAL(writeLog(QString)),this, SLOT(writeLog(QString)));
-
-
-
 
     int i;
     mBootloader->hexOpen = false;
@@ -83,8 +76,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     settings.beginGroup("MainWindow");
     fileName = settings.value("fileName").toString();
 
-    for(i = 0; i < MAX_RECENT_FILES; i++)
-    {
+    for(i = 0; i < MAX_RECENT_FILES; i++) {
         recentFiles[i] = new QAction(this);
         connect(recentFiles[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
         recentFiles[i]->setVisible(false);
@@ -104,10 +96,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
 
-    connect(timer, SIGNAL(timeout()), this, SLOT(Connection()));
-    connect(this, SIGNAL(IoWithDeviceCompleted(QString,Comm::ErrorCode,double)), this, SLOT(IoWithDeviceComplete(QString,Comm::ErrorCode,double)));
-    connect(this, SIGNAL(IoWithDeviceStarted(QString)), this, SLOT(IoWithDeviceStart(QString)));
-    connect(this, SIGNAL(AppendString(QString)), this, SLOT(AppendStringToTextbox(QString)));
+    connect(timer, SIGNAL(timeout()), mBootloader, SLOT(Connection()));
     connect(this, SIGNAL(SetProgressBar(int)), this, SLOT(UpdateProgressBar(int)));
     connect(mBootloader->comm, SIGNAL(SetProgressBar(int)), this, SLOT(UpdateProgressBar(int)));
 
@@ -165,52 +154,6 @@ MainWindow::~MainWindow()
     delete mBootloader;
 }
 
-void MainWindow::Connection(void)
-{
-    bool currStatus = mBootloader->comm->isConnected();
-    Comm::ErrorCode result;
-
-    mBootloader->comm->PollUSB();
-
-    if(currStatus != mBootloader->comm->isConnected())
-    {
-        UpdateRecentFileList();
-
-        if(mBootloader->comm->isConnected())
-        {
-            qWarning("Attempting to open device...");
-            mBootloader->comm->open();
-            ui->plainTextEdit->setPlainText("Device Attached.");
-            ui->plainTextEdit->appendPlainText("Connecting...");
-            if(mBootloader->writeConfig)
-            {
-                //ui->plainTextEdit->appendPlainText("Disabling Erase button to prevent accidental erasing of the configuration words without reprogramming them\n");
-                mBootloader->writeConfig = true;
-                result = mBootloader->comm->LockUnlockConfig(false);
-                if(result == Comm::Success)
-                {
-                    ui->plainTextEdit->appendPlainText("Unlocked Configuration bits successfully\n");
-                }
-            }
-            else
-            {
-                mBootloader->writeConfig = false;
-            }
-            mBootloader->GetQuery();
-        }
-        else
-        {
-            qWarning("Closing device.");
-            mBootloader->comm->close();
-            deviceLabel.setText("Disconnected");
-            ui->plainTextEdit->setPlainText("Device Detached.");
-            mBootloader->hexOpen = false;
-            setBootloadEnabled(false);
-            emit SetProgressBar(0);
-        }
-    }
-}
-
 void MainWindow::setBootloadEnabled(bool enable)
 {
     ui->action_Settings->setEnabled(enable);
@@ -247,71 +190,18 @@ void MainWindow::setBootloadBusy(bool busy)
     ui->actionReset_Device->setEnabled(!busy);
 }
 
-void MainWindow::on_actionExit_triggered()
-{
+void MainWindow::on_actionExit_triggered() {
     QApplication::exit();
 }
 
-void MainWindow::IoWithDeviceStart(QString msg)
-{
-    ui->plainTextEdit->appendPlainText(msg);
-    setBootloadBusy(true);
-}
-
-
-//Useful for adding lines of text to the main window from other threads.
-void MainWindow::AppendStringToTextbox(QString msg)
-{
-    ui->plainTextEdit->appendPlainText(msg);
-}
-
-void MainWindow::UpdateProgressBar(int newValue)
-{
+void MainWindow::UpdateProgressBar(int newValue) {
     ui->progressBar->setValue(newValue);
-}
-
-
-
-void MainWindow::IoWithDeviceComplete(QString msg, Comm::ErrorCode result, double time)
-{
-    QTextStream ss(&msg);
-
-    switch(result)
-    {
-        case Comm::Success:
-            ss << " Complete (" << time << "s)\n";
-            setBootloadBusy(false);
-            break;
-        case Comm::NotConnected:
-            ss << " Failed. Device not connected.\n";
-            setBootloadBusy(false);
-            break;
-        case Comm::Fail:
-            ss << " Failed.\n";
-            setBootloadBusy(false);
-            break;
-        case Comm::IncorrectCommand:
-            ss << " Failed. Unable to communicate with device.\n";
-            setBootloadBusy(false);
-            break;
-        case Comm::Timeout:
-            ss << " Timed out waiting for device (" << time << "s)\n";
-            setBootloadBusy(false);
-            break;
-        default:
-            break;
-    }
-
-    ui->plainTextEdit->appendPlainText(msg);
 }
 
 void MainWindow::on_action_Verify_Device_triggered()
 {
     future = QtConcurrent::run(mBootloader, &Bootloader::VerifyDevice);
 }
-
-
-
 //Gets called when the user clicks to program button in the GUI.
 void MainWindow::on_actionWrite_Device_triggered()
 {
@@ -321,8 +211,6 @@ void MainWindow::on_actionWrite_Device_triggered()
     ui->plainTextEdit->appendPlainText("Do not unplug device or disconnect power until the operation is fully complete.");
     ui->plainTextEdit->appendPlainText(" ");
 }
-
-
 
 void MainWindow::on_actionBlank_Check_triggered()
 {

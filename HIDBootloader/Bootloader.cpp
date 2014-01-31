@@ -6,10 +6,19 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 
+
+//Surely the micro doesn't have a programmable memory region greater than 268 Megabytes...
+//Value used for error checking device reponse values.
+#define MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE 0x0FFFFFFF
+
+
+
 /**
  *
  */
 Bootloader::Bootloader() {    
+    deviceFirmwareIsAtLeast101 = false;
+
     comm = new Comm();
     deviceData = new DeviceData();
     hexData = new DeviceData();
@@ -30,20 +39,46 @@ Bootloader::~Bootloader() {
 }
 
 
-//Surely the micro doesn't have a programmable memory region greater than 268 Megabytes...
-//Value used for error checking device reponse values.
-#define MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE 0x0FFFFFFF
+void Bootloader::Connection(void) {
+    bool currStatus = comm->isConnected();
+    Comm::ErrorCode result;
 
+    comm->PollUSB();
 
-void Bootloader::IoWithDeviceStart(QString msg)
-{
+    if (currStatus != comm->isConnected()) {
+        if (comm->isConnected()) {
+            qWarning("Attempting to open device...");
+            comm->open();
+            emit writeLog("Connecting...");
+            if(writeConfig) {
+                emit writeLog("Disabling Erase button to prevent accidental erasing of the configuration words without reprogramming them\n");
+                writeConfig = true;
+                result = comm->LockUnlockConfig(false);
+                if (result == Comm::Success) {
+                    emit writeLog("Unlocked Configuration bits successfully\n");
+                }
+            } else {
+                writeConfig = false;
+            }
+            GetQuery();
+        } else {
+            qWarning("Closing device.");
+            comm->close();
+            emit writeLog("Device Detached.");
+            hexOpen = false;
+//            setBootloadEnabled(false);
+//            emit SetProgressBar(0);
+        }
+    }
+}
+
+void Bootloader::IoWithDeviceStart(QString msg) {
     emit writeLog(msg);
     emit setBootloadBusy(true);
 }
 
 
-void Bootloader::IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double time)
-{
+void Bootloader::IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double time) {
     QTextStream ss(&msg);
 
     switch(result)
@@ -77,8 +112,7 @@ void Bootloader::IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double
 //Routine that verifies the contents of the non-voltaile memory regions in the device, after an erase/programming cycle.
 //This function requests the memory contents of the device, then compares it against the parsed .hex file data to make sure
 //The locations that got programmed properly match.
-void Bootloader::VerifyDevice()
-{
+void Bootloader::VerifyDevice() {
     Comm::ErrorCode result;
     DeviceData::MemoryRange deviceRange, hexRange;
     QTime elapsed;

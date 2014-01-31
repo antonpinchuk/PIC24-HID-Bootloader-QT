@@ -19,9 +19,6 @@ signals:
    void setBootloadBusy(bool value);
 
 protected:
-
-    bool deviceFirmwareIsAtLeast101 = false;
-
     Comm::ExtendedQueryInfo extendedBootInfo;
 
     void IoWithDeviceStart(QString msg);
@@ -30,8 +27,9 @@ protected:
 
     QString fileName, watchFileName;
 
-    //void IoWithDeviceStarted(QString msg);
-    //void IoWithDeviceCompleted(QString msg, Comm::ErrorCode, double time);
+public slots:
+    void Connection(void);
+
 
 public:    
 
@@ -40,7 +38,7 @@ public:
     DeviceData* hexData;
     Device* device;
 
-
+    bool deviceFirmwareIsAtLeast101;
     bool writeFlash;
     bool writeEeprom;
     bool writeConfig;
