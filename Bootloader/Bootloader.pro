@@ -1,50 +1,31 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-01-23T15:46:03
-#
-#-------------------------------------------------
-
-QT += core gui
-QT += network
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-VERSION = 0.0.1.1401301400
-TARGET = viking-one
+TARGET = "HIDBootloader"
 TEMPLATE = app
-
-DEFINES += APPLICATION_VERSION=\"\\\"$$VERSION\\\"\"
-
+QT += sql
+QT += widgets
+QMAKE_CXXFLAGS_RELEASE = -Os
 INCLUDEPATH += ../
 HEADERS += \
-    mainwindow.h \
-    updatescheduler.h \
-    updateavailabledialog.h \
+    Settings.h \
+    MainWindow.h \
     ../HIDBootloader/Bootloader.h \
     ../HIDBootloader/Comm.h \
     ../HIDBootloader/DeviceData.h \
     ../HIDBootloader/Device.h \
     ../HIDBootloader/ImportExportHex.h
-
 SOURCES += \
-    main.cpp\
-    mainwindow.cpp \
-    updatescheduler.cpp \
-    updateavailabledialog.cpp \
+    Settings.cpp \
+    MainWindow.cpp \
+    main.cpp \
     ../HIDBootloader/Bootloader.cpp \
     ../HIDBootloader/Comm.cpp \
     ../HIDBootloader/DeviceData.cpp \
     ../HIDBootloader/Device.cpp \
     ../HIDBootloader/ImportExportHex.cpp
 
-FORMS += \
-    mainwindow.ui \
-    updateavailabledialog.ui
-
-OTHER_FILES +=
-
-RESOURCES += \
-    res.qrc
+FORMS += MainWindow.ui \
+    Settings.ui
+RESOURCES += resources.qrc
+OTHER_FILES += windows.rc
 
 #-------------------------------------------------
 # Add the correct HIDAPI library according to what
