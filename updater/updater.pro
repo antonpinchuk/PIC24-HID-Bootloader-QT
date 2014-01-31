@@ -7,11 +7,15 @@
 QT       += core gui
 QT       += network
 
+
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = viking-upd
+VERSION  = 1.0.0.1401301400
+TARGET   = viking-upd
 TEMPLATE = app
 
+DEFINES += APPLICATION_VERSION=\"\\\"$$VERSION\\\"\"
 
 SOURCES += main.cpp\
         mainwindow.cpp
