@@ -1,5 +1,6 @@
 #include "Bootloader.h"
 
+#include <QTime>
 #include <QSettings>
 
 
@@ -374,7 +375,7 @@ void Bootloader::VerifyDevice()
 //This thread programs previously parsed .hex file data into the device's programmable memory regions.
 void Bootloader::WriteDevice(void)
 {
-//    QTime elapsed;
+    QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange hexRange;
 
@@ -449,11 +450,11 @@ void Bootloader::WriteDevice(void)
 
 void Bootloader::BlankCheckDevice(void)
 {
-//    QTime elapsed;
+    QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange deviceRange;
 
-    //elapsed.start();
+    elapsed.start();
 
     foreach(deviceRange, deviceData->ranges)
     {
@@ -533,7 +534,7 @@ void Bootloader::EraseDevice(void)
     Comm::BootInfo bootInfo;
 
 
-    //if(writeFlash || writeEeprom)
+    if(writeFlash || writeEeprom)
     {
 //        emit IoWithDeviceStarted("Erasing Device... (no status update until complete, may take several seconds)");
  //       elapsed.start();
@@ -590,6 +591,7 @@ void Bootloader::LoadFile(QString newFileName)
             break;
 
         case HexImporter::CouldNotOpenFile:
+
 //            QApplication::restoreOverrideCursor();
 //            stream << "Error: Could not open file " << nfi.fileName() << "\n";
 //            ui->plainTextEdit->appendPlainText(msg);

@@ -105,7 +105,8 @@ private:
 
     bool wasBootloaderMode;
 
-
+private slots:
+        void writeLog(Qstring value);
 
 private slots:
     void on_actionBlank_Check_triggered();

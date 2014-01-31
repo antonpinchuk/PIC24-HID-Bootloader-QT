@@ -13,14 +13,14 @@ class Bootloader : public QObject {
     Q_OBJECT
 
 
-public slots:
-   void writeLog(Qstring value);
+
 signals:
-   void readLog(Qstring value);
+   void writeLog(QString value);
 
 protected:
 
     bool deviceFirmwareIsAtLeast101 = false;
+
     Comm::ExtendedQueryInfo extendedBootInfo;
 
 
