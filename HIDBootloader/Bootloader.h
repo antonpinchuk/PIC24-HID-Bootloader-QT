@@ -1,6 +1,9 @@
 #ifndef BOOTLOADER_H
 #define BOOTLOADER_H
 
+#include "DeviceData.h"
+#include "Device.h"
+#include "ImportExportHex.h"
 #include "Comm.h"
 
 /*!
@@ -13,7 +16,38 @@ signals:
 
 protected:
 
-public:
+    bool deviceFirmwareIsAtLeast101 = false;
+    Comm::ExtendedQueryInfo extendedBootInfo;
+
+
+
+
+    QString fileName, watchFileName;
+
+
+public:    
+
+    Comm* comm;
+    DeviceData* deviceData;
+    DeviceData* hexData;
+    Device* device;
+
+
+    bool writeFlash;
+    bool writeEeprom;
+    bool writeConfig;
+    bool eraseDuringWrite;
+    bool hexOpen;
+
+    bool wasBootloaderMode;
+
+    void GetQuery(void);
+    void EraseDevice(void);
+    void BlankCheckDevice(void);
+    void WriteDevice(void);
+    void VerifyDevice(void);
+
+    void LoadFile(QString fileName);
 
     explicit Bootloader();
     ~Bootloader();
@@ -21,3 +55,4 @@ public:
 };
 
 #endif // BOOTLOADER_H
+

@@ -41,6 +41,8 @@
 #include "HIDBootloader/Device.h"
 #include "HIDBootloader/ImportExportHex.h"
 
+
+
 namespace Ui
 {
     class MainWindowClass;
@@ -56,16 +58,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    Bootloader *mBootloader;
+
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
     void GetQuery(void);
     void LoadFile(QString fileName);
-
-    void EraseDevice(void);
-    void BlankCheckDevice(void);
-    void WriteDevice(void);
-    void VerifyDevice(void);
 
     void setBootloadBusy(bool busy);
 
@@ -84,22 +83,12 @@ public slots:
     void UpdateProgressBar(int newValue);
 
 protected:
-    Comm* comm;
-    DeviceData* deviceData;
-    DeviceData* hexData;
-    Device* device;
 
     QFuture<void> future;
 
     QString fileName, watchFileName;
     QFileSystemWatcher* fileWatcher;
     QTimer *timer;
-
-    bool writeFlash;
-    bool writeEeprom;
-    bool writeConfig;
-    bool eraseDuringWrite;
-    bool hexOpen;
 
     void setBootloadEnabled(bool enable);
 
@@ -115,6 +104,8 @@ private:
     QAction *recentFiles[MAX_RECENT_FILES];
 
     bool wasBootloaderMode;
+
+
 
 private slots:
     void on_actionBlank_Check_triggered();
