@@ -555,12 +555,6 @@ void Bootloader::EraseDevice(void)
 
 void Bootloader::LoadFile(QString newFileName)
 {
-    QString msg;
-//    QTextStream stream(&msg);
-//    QFileInfo nfi(newFileName);
-
-    //QApplication::setOverrideCursor(Qt::BusyCursor);
-
     HexImporter import;
     HexImporter::ErrorCode result;
     Comm::ErrorCode commResultCode;
@@ -645,29 +639,7 @@ void Bootloader::LoadFile(QString newFileName)
     fileName = newFileName;
     watchFileName = newFileName;
 
-    QSettings settings;
-//    settings.beginGroup("MainWindow");
-
-    QStringList files = settings.value("recentFileList").toStringList();
-    files.removeAll(fileName);
-    files.prepend(fileName);
-//    while(files.size() > MAX_RECENT_FILES)
-    //{
-//        files.removeLast();
-//    }
-    settings.setValue("recentFileList", files);
-//    UpdateRecentFileList();
-
-    //stream.setIntegerBase(10);
-
-    msg.clear();
-    //QFileInfo fi(fileName);
-//    QString name = fi.fileName();
-    //stream << "Opened: " << name << "\n";
-//    ui->plainTextEdit->appendPlainText(msg);
     hexOpen = true;
-    //setBootloadEnabled(true);
-//    QApplication::restoreOverrideCursor();
 
     return;
 }
@@ -830,15 +802,5 @@ void Bootloader::GetQuery()
         //Add the new structure+buffer to the list
         deviceData->ranges.append(range);
     }
-
-
-    //Make sure user has allowed at least one region to be programmed
-    //if(!(writeFlash || writeEeprom || writeConfig))
-    {
-        //setBootloadEnabled(false);
-//        ui->action_Settings->setEnabled(true);
-    }
-    //else
-        //setBootloadEnabled(true);
 }
 

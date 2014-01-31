@@ -12,7 +12,11 @@
 class Bootloader : public QObject {
     Q_OBJECT
 
+
+public slots:
+   void writeLog(Qstring value);
 signals:
+   void readLog(Qstring value);
 
 protected:
 
