@@ -58,7 +58,7 @@
 bool deviceFirmwareIsAtLeast101 = false;
 Comm::ExtendedQueryInfo extendedBootInfo;
 
-void MainWindow::writeLog(Qstring value){
+void MainWindow::writeLog(QString value){
     ui->plainTextEdit->setPlainText(value);
 }
 
@@ -66,7 +66,7 @@ void MainWindow::writeLog(Qstring value){
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindowClass)
 {
     mBootloader = new Bootloader();
-    QObject::connect(&mBootloader, SIGNAL(writeLog(QString)),&this, SLOT(writeLog(QStrign)));
+    connect(mBootloader, SIGNAL(writeLog(QString)),this, SLOT(writeLog(QString)));
 
 
 

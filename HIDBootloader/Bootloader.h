@@ -16,6 +16,7 @@ class Bootloader : public QObject {
 
 signals:
    void writeLog(QString value);
+   void setBootloadBusy(bool value);
 
 protected:
 
@@ -23,11 +24,14 @@ protected:
 
     Comm::ExtendedQueryInfo extendedBootInfo;
 
-
+    void IoWithDeviceStart(QString msg);
+    void IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double time);
 
 
     QString fileName, watchFileName;
 
+    //void IoWithDeviceStarted(QString msg);
+    //void IoWithDeviceCompleted(QString msg, Comm::ErrorCode, double time);
 
 public:    
 

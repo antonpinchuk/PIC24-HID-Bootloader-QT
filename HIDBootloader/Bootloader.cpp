@@ -2,7 +2,9 @@
 
 #include <QTime>
 #include <QSettings>
-
+#include <QTextStream>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 /**
  *
@@ -32,6 +34,46 @@ Bootloader::~Bootloader() {
 //Value used for error checking device reponse values.
 #define MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE 0x0FFFFFFF
 
+
+void Bootloader::IoWithDeviceStart(QString msg)
+{
+    emit writeLog(msg);
+    emit setBootloadBusy(true);
+}
+
+
+void Bootloader::IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double time)
+{
+    QTextStream ss(&msg);
+
+    switch(result)
+    {
+        case Comm::Success:
+            ss << " Complete (" << time << "s)\n";
+            emit setBootloadBusy(false);
+            break;
+        case Comm::NotConnected:
+            ss << " Failed. Device not connected.\n";
+            emit setBootloadBusy(false);
+            break;
+        case Comm::Fail:
+            ss << " Failed.\n";
+            emit setBootloadBusy(false);
+            break;
+        case Comm::IncorrectCommand:
+            ss << " Failed. Unable to communicate with device.\n";
+            emit setBootloadBusy(false);
+            break;
+        case Comm::Timeout:
+            ss << " Timed out waiting for device (" << time << "s)\n";
+            emit setBootloadBusy(false);
+            break;
+        default:
+            break;
+    }
+    emit writeLog(msg);
+}
+
 //Routine that verifies the contents of the non-voltaile memory regions in the device, after an erase/programming cycle.
 //This function requests the memory contents of the device, then compares it against the parsed .hex file data to make sure
 //The locations that got programmed properly match.
@@ -39,7 +81,7 @@ void Bootloader::VerifyDevice()
 {
     Comm::ErrorCode result;
     DeviceData::MemoryRange deviceRange, hexRange;
-//    QTime elapsed;
+    QTime elapsed;
     unsigned int i, j;
     unsigned int arrayIndex;
     bool failureDetected = false;
@@ -51,13 +93,13 @@ void Bootloader::VerifyDevice()
     //Used later for post SIGN_FLASH verify operation.
     memset(&hexEraseBlockData[0], 0xFF, MAX_ERASE_BLOCK_SIZE);
 
-    //emit IoWithDeviceStarted("Verifying Device...");
+    emit writeLog("Verifying Device...");
     foreach(deviceRange, deviceData->ranges)
     {
         if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
         {
-//            elapsed.start();
-            //emit IoWithDeviceStarted("Verifying Device's Program Memory...");
+            elapsed.start();
+            emit writeLog("Verifying Device's Program Memory...");
 
             result = comm->GetData(deviceRange.start,
                                    device->bytesPerPacket,
@@ -70,7 +112,7 @@ void Bootloader::VerifyDevice()
             {
                 failureDetected = true;
                 qWarning("Error reading device.");
-                //emit IoWithDeviceCompleted("Verifying Device's Program Memory", result, ((double)elapsed.elapsed()) / 1000);
+                IoWithDeviceComplet("Verifying Device's Program Memory", result, ((double)elapsed.elapsed()) / 1000);
             }
 
             //Search through all of the programmable memory regions from the parsed .hex file data.
@@ -117,7 +159,7 @@ void Bootloader::VerifyDevice()
                                         qWarning("Device: 0x%x Hex: 0x%x", deviceRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j], hexRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j]);
                                     }
                                     qWarning("Failed verify at address 0x%x", i);
-//                                    emit IoWithDeviceCompleted("Verify", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
+                                    IoWithDeviceComplet("Verify", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
                                     return;
                                 }
                             }//if(deviceRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j] != hexRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j])
@@ -125,12 +167,11 @@ void Bootloader::VerifyDevice()
                     }//for(i = deviceRange.start; i < deviceRange.end; i++)
                 }//if(deviceRange.start == hexRange.start)
             }//foreach(hexRange, hexData->ranges)
-            //emit IoWithDeviceCompleted("Verify", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+            IoWithDeviceComplet("Verify", Comm::Success, ((double)elapsed.elapsed()) / 1000);
         }//if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
-        else if(writeEeprom && (deviceRange.type == EEPROM_MEMORY))
-        {
-//            elapsed.start();
-            //emit IoWithDeviceStarted("Verifying Device's EEPROM Memory...");
+        else if (writeEeprom && (deviceRange.type == EEPROM_MEMORY)) {
+            elapsed.start();
+            IoWithDeviceStart("Verifying Device's EEPROM Memory...");
 
             result = comm->GetData(deviceRange.start,
                                    device->bytesPerPacket,
@@ -139,11 +180,10 @@ void Bootloader::VerifyDevice()
                                    deviceRange.end,
                                    deviceRange.pDataBuffer);
 
-            if(result != Comm::Success)
-            {
+            if(result != Comm::Success) {
                 failureDetected = true;
                 qWarning("Error reading device.");
-                //emit IoWithDeviceCompleted("Verifying Device's EEPROM Memory", result, ((double)elapsed.elapsed()) / 1000);
+                IoWithDeviceComplet("Verifying Device's EEPROM Memory", result, ((double)elapsed.elapsed()) / 1000);
             }
 
 
@@ -169,19 +209,18 @@ void Bootloader::VerifyDevice()
                                 failureDetected = true;
                                 qWarning("Device: 0x%x Hex: 0x%x", deviceRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j], hexRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressFLASH)+j]);
                                 qWarning("Failed verify at address 0x%x", i);
-//                                emit IoWithDeviceCompleted("Verify EEPROM Memory", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
+                                IoWithDeviceComplet("Verify EEPROM Memory", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
                                 return;
                             }
                         }
                     }
                 }
             }//foreach(hexRange, hexData->ranges)
-            //emit IoWithDeviceCompleted("Verifying", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+            IoWithDeviceComplet("Verifying", Comm::Success, ((double)elapsed.elapsed()) / 1000);
         }//else if(writeEeprom && (deviceRange.type == EEPROM_MEMORY))
-        else if(writeConfig && (deviceRange.type == CONFIG_MEMORY))
-        {
-//            elapsed.start();
-            //emit IoWithDeviceStarted("Verifying Device's Config Words...");
+        else if (writeConfig && (deviceRange.type == CONFIG_MEMORY)) {
+            elapsed.start();
+            IoWithDeviceStart("Verifying Device's Config Words...");
 
             result = comm->GetData(deviceRange.start,
                                    device->bytesPerPacket,
@@ -190,34 +229,28 @@ void Bootloader::VerifyDevice()
                                    deviceRange.end,
                                    deviceRange.pDataBuffer);
 
-            if(result != Comm::Success)
-            {
+            if (result != Comm::Success) {
                 failureDetected = true;
                 qWarning("Error reading device.");
-                //emit IoWithDeviceCompleted("Verifying Device's Config Words", result, ((double)elapsed.elapsed()) / 1000);
+                IoWithDeviceComplet("Verifying Device's Config Words", result, ((double)elapsed.elapsed()) / 1000);
             }
 
             //Search through all of the programmable memory regions from the parsed .hex file data.
             //For each of the programmable memory regions found, if the region also overlaps a region
             //that was included in the device programmed area (which just got read back with GetData()),
             //then verify both the parsed hex contents and read back data match.
-            foreach(hexRange, hexData->ranges)
-            {
-                if(deviceRange.start == hexRange.start)
-                {
+            foreach (hexRange, hexData->ranges) {
+                if (deviceRange.start == hexRange.start) {
                     //For this entire programmable memory address range, check to see if the data read from the device exactly
                     //matches what was in the hex file.
-                    for(i = deviceRange.start; i < deviceRange.end; i++)
-                    {
+                    for (i = deviceRange.start; i < deviceRange.end; i++) {
                         //For each byte of each device address (1 on PIC18, 2 on PIC24, since flash memory is 16-bit WORD array)
-                        for(j = 0; j < device->bytesPerAddressConfig; j++)
-                        {
+                        for (j = 0; j < device->bytesPerAddressConfig; j++) {
                             //Compute an index into the device and hex data arrays, based on the current i and j values.
                             arrayIndex = ((i - deviceRange.start) * device->bytesPerAddressConfig)+j;
 
                             //Check if the device response data matches the data we parsed from the original input .hex file.
-                            if(deviceRange.pDataBuffer[arrayIndex] != hexRange.pDataBuffer[arrayIndex])
-                            {
+                            if (deviceRange.pDataBuffer[arrayIndex] != hexRange.pDataBuffer[arrayIndex]) {
                                 //A mismatch was detected.  Perform additional checks to make sure it was a real/unexpected verify failure.
 
                                 //Check if this is a PIC24 device and we are looking at the "phantom byte"
@@ -235,8 +268,7 @@ void Bootloader::VerifyDevice()
                                      //The "CONFIG3L" and "CONFIG4H" locations (0x300004 and 0x300007) on PIC18 non-J USB devices
                                      //are unimplemented and should be masked out from the verify operation.
                                 }
-                                else
-                                {
+                                else {
                                     //If the data wasn't a match, and this wasn't a PIC24 phantom byte, then if we get
                                     //here this means we found a true verify failure.
                                     failureDetected = true;
@@ -249,7 +281,7 @@ void Bootloader::VerifyDevice()
                                         qWarning("Device: 0x%x Hex: 0x%x", deviceRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressConfig)+j], hexRange.pDataBuffer[((i - deviceRange.start) * device->bytesPerAddressConfig)+j]);
                                     }
                                     qWarning("Failed verify at address 0x%x", i);
-//                                    emit IoWithDeviceCompleted("Verify Config Bit Memory", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
+                                    IoWithDeviceComplet("Verify Config Bit Memory", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
                                     return;
                                 }
                             }
@@ -257,7 +289,7 @@ void Bootloader::VerifyDevice()
                     }
                 }
             }//foreach(hexRange, hexData->ranges)
-            //emit IoWithDeviceCompleted("Verifying", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+            IoWithDeviceComplet("Verifying", Comm::Success, ((double)elapsed.elapsed()) / 1000);
         }//else if(writeConfig && (deviceRange.type == CONFIG_MEMORY))
         else
         {
@@ -354,19 +386,16 @@ void Bootloader::VerifyDevice()
 
     }//if(failureDetected == false)
 
-    if(failureDetected == true)
-    {
-//        emit AppendString("Operation aborted due to error encountered during verify operation.");
-//        emit AppendString("Please try the erase/program/verify sequence again.");
-//        emit AppendString("If repeated failures are encountered, this may indicate the flash");
-//        emit AppendString("memory has worn out, that the device has been damaged, or that");
-//        emit AppendString("there is some other unidentified problem.");
-    }
-    else
-    {
-//        emit IoWithDeviceCompleted("Verify", Comm::Success, ((double)elapsed.elapsed()) / 1000);
-//        emit AppendString("Erase/Program/Verify sequence completed successfully.");
-//        emit AppendString("You may now unplug or reset the device.");
+    if(failureDetected == true) {
+        emit writeLog("Operation aborted due to error encountered during verify operation.");
+        emit writeLog("Please try the erase/program/verify sequence again.");
+        emit writeLog("If repeated failures are encountered, this may indicate the flash");
+        emit writeLog("memory has worn out, that the device has been damaged, or that");
+        emit writeLog("there is some other unidentified problem.");
+    } else {
+        IoWithDeviceComplet("Verify", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+        emit writeLog("Erase/Program/Verify sequence completed successfully.");
+        emit writeLog("You may now unplug or reset the device.");
     }
 
 //    emit SetProgressBar(100);   //Set progress bar to 100%
@@ -387,7 +416,7 @@ void Bootloader::WriteDevice(void)
     //Now being re-programming each section based on the info we obtained when
     //we parsed the user's .hex file.
 
-//    emit IoWithDeviceStarted("Writing Device...");
+    IoWithDeviceStart("Writing Device...");
     foreach(hexRange, hexData->ranges)
     {
         if(writeFlash && (hexRange.type == PROGRAM_MEMORY))
@@ -434,7 +463,7 @@ void Bootloader::WriteDevice(void)
             continue;
         }
 
-        //emit IoWithDeviceCompleted("Writing", result, ((double)elapsed.elapsed()) / 1000);
+        IoWithDeviceComplet("Writing", result, ((double)elapsed.elapsed()) / 1000);
 
         if(result != Comm::Success)
         {
@@ -443,7 +472,7 @@ void Bootloader::WriteDevice(void)
         }
     }
 
-//    emit IoWithDeviceCompleted("Write", result, ((double)elapsed.elapsed()) / 1000);
+    IoWithDeviceComplet("Write", result, ((double)elapsed.elapsed()) / 1000);
 
     VerifyDevice();
 }
@@ -456,11 +485,9 @@ void Bootloader::BlankCheckDevice(void)
 
     elapsed.start();
 
-    foreach(deviceRange, deviceData->ranges)
-    {
-        if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
-        {
-//            emit IoWithDeviceStarted("Blank Checking Device's Program Memory...");
+    foreach (deviceRange, deviceData->ranges) {
+        if (writeFlash && (deviceRange.type == PROGRAM_MEMORY)) {
+        IoWithDeviceStart("Blank Checking Device's Program Memory...");
 
             result = comm->GetData(deviceRange.start,
                                    device->bytesPerPacket,
@@ -470,28 +497,24 @@ void Bootloader::BlankCheckDevice(void)
                                    deviceRange.pDataBuffer);
 
 
-            if(result != Comm::Success)
-            {
+            if (result != Comm::Success) {
                 qWarning("Blank Check failed");
-//                emit IoWithDeviceCompleted("Blank Checking Program Memory", result, ((double)elapsed.elapsed()) / 1000);
+                IoWithDeviceComplet("Blank Checking Program Memory", result, ((double)elapsed.elapsed()) / 1000);
                 return;
             }
 
-            for(unsigned int i = 0; i < ((deviceRange.end - deviceRange.start) * device->bytesPerAddressFLASH); i++)
-            {
+            for (unsigned int i = 0; i < ((deviceRange.end - deviceRange.start) * device->bytesPerAddressFLASH); i++) {
                 if((deviceRange.pDataBuffer[i] != 0xFF) && !((device->family == Device::PIC24) && ((i % 4) == 3)))
                 {
                     qWarning("Failed blank check at address 0x%x", deviceRange.start + i);
                     qWarning("The value was 0x%x", deviceRange.pDataBuffer[i]);
-//                    emit IoWithDeviceCompleted("Blank Check", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
+                    IoWithDeviceComplet("Blank Check", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
                     return;
                 }
             }
-//            emit IoWithDeviceCompleted("Blank Checking Program Memory", Comm::Success, ((double)elapsed.elapsed()) / 1000);
-        }
-        else if(writeEeprom && deviceRange.type == EEPROM_MEMORY)
-        {
-//            emit IoWithDeviceStarted("Blank Checking Device's EEPROM Memory...");
+            IoWithDeviceComplet("Blank Checking Program Memory", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+        } else if(writeEeprom && deviceRange.type == EEPROM_MEMORY) {
+            IoWithDeviceStart("Blank Checking Device's EEPROM Memory...");
 
             result = comm->GetData(deviceRange.start,
                                    device->bytesPerPacket,
@@ -501,27 +524,21 @@ void Bootloader::BlankCheckDevice(void)
                                    deviceRange.pDataBuffer);
 
 
-            if(result != Comm::Success)
-            {
+            if (result != Comm::Success) {
                 qWarning("Blank Check failed");
- //               emit IoWithDeviceCompleted("Blank Checking EEPROM Memory", result, ((double)elapsed.elapsed()) / 1000);
+                IoWithDeviceComplet("Blank Checking EEPROM Memory", result, ((double)elapsed.elapsed()) / 1000);
                 return;
             }
-
-            for(unsigned int i = 0; i < ((deviceRange.end - deviceRange.start) * device->bytesPerWordEEPROM); i++)
-            {
-                if(deviceRange.pDataBuffer[i] != 0xFF)
-                {
+            for (unsigned int i = 0; i < ((deviceRange.end - deviceRange.start) * device->bytesPerWordEEPROM); i++) {
+                if(deviceRange.pDataBuffer[i] != 0xFF){
                     qWarning("Failed blank check at address 0x%x + 0x%x", deviceRange.start, i);
                     qWarning("The value was 0x%x", deviceRange.pDataBuffer[i]);
-//                    emit IoWithDeviceCompleted("Blank Check", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
+                    IoWithDeviceComplet("Blank Check", Comm::Fail, ((double)elapsed.elapsed()) / 1000);
                     return;
                 }
             }
-//            emit IoWithDeviceCompleted("Blank Checking EEPROM Memory", Comm::Success, ((double)elapsed.elapsed()) / 1000);
-        }
-        else
-        {
+                IoWithDeviceComplet("Blank Checking EEPROM Memory", Comm::Success, ((double)elapsed.elapsed()) / 1000);
+        } else {
             continue;
         }
     }
@@ -529,26 +546,23 @@ void Bootloader::BlankCheckDevice(void)
 
 void Bootloader::EraseDevice(void)
 {
-//    QTime elapsed;
+    QTime elapsed;
     Comm::ErrorCode result;
     Comm::BootInfo bootInfo;
 
 
-    if(writeFlash || writeEeprom)
-    {
-//        emit IoWithDeviceStarted("Erasing Device... (no status update until complete, may take several seconds)");
- //       elapsed.start();
+    if (writeFlash || writeEeprom) {
+        IoWithDeviceStart("Erasing Device... (no status update until complete, may take several seconds)");
+        elapsed.start();
 
         result = comm->Erase();
-        if(result != Comm::Success)
-        {
-//            emit IoWithDeviceCompleted("Erase", result, ((double)elapsed.elapsed()) / 1000);
+        if (result != Comm::Success) {
+            IoWithDeviceComplet("Erase", result, ((double)elapsed.elapsed()) / 1000);
             return;
         }
 
         result = comm->ReadBootloaderInfo(&bootInfo);
-
-//        emit IoWithDeviceCompleted("Erase", result, ((double)elapsed.elapsed()) / 1000);
+        IoWithDeviceComplet("Erase", result, ((double)elapsed.elapsed()) / 1000);
     }
 }
 
@@ -556,6 +570,10 @@ void Bootloader::EraseDevice(void)
 
 void Bootloader::LoadFile(QString newFileName)
 {
+    QString msg;
+    QTextStream stream(&msg);
+    QFileInfo nfi(newFileName);
+
     HexImporter import;
     HexImporter::ErrorCode result;
     Comm::ErrorCode commResultCode;
@@ -567,8 +585,7 @@ void Bootloader::LoadFile(QString newFileName)
 
     //First duplicate the deviceData programmable region list and
     //allocate some RAM buffers to hold the hex data that we are about to import.
-    foreach(DeviceData::MemoryRange range, deviceData->ranges)
-    {
+    foreach (DeviceData::MemoryRange range, deviceData->ranges) {
         //Allocate some RAM for the hex file data we are about to import.
         //Initialize all bytes of the buffer to 0xFF, the default unprogrammed memory value,
         //which is also the "assumed" value, if a value is missing inside the .hex file, but
@@ -585,56 +602,47 @@ void Bootloader::LoadFile(QString newFileName)
     //Import the hex file data into the hexData->ranges[].pDataBuffer buffers.
     result = import.ImportHexFile(newFileName, hexData, device);
     //Based on the result of the hex file import operation, decide how to proceed.
-    switch(result)
-    {
+    switch (result) {
         case HexImporter::Success:
             break;
 
         case HexImporter::CouldNotOpenFile:
-
-//            QApplication::restoreOverrideCursor();
-//            stream << "Error: Could not open file " << nfi.fileName() << "\n";
-//            ui->plainTextEdit->appendPlainText(msg);
+            stream << "Error: Could not open file " << nfi.fileName() << "\n";
+            emit writeLog(msg);
             return;
 
         case HexImporter::NoneInRange:
-//            QApplication::restoreOverrideCursor();
-//            stream << "No address within range in file: " << nfi.fileName() << ".  Verify the correct firmware image was specified and is designed for your device.\n";
-//            /ui->plainTextEdit->appendPlainText(msg);
+            stream << "No address within range in file: " << nfi.fileName() << ".  Verify the correct firmware image was specified and is designed for your device.\n";
+            emit writeLog(msg);
             return;
 
         case HexImporter::ErrorInHexFile:
-//            QApplication::restoreOverrideCursor();
-//            stream << "Error in hex file.  Please make sure the firmware image supplied was designed for the device to be programmed. \n";
-//            ui->plainTextEdit->appendPlainText(msg);
+            stream << "Error in hex file.  Please make sure the firmware image supplied was designed for the device to be programmed. \n";
+            emit writeLog(msg);
             return;
         case HexImporter::InsufficientMemory:
-//            QApplication::restoreOverrideCursor();
-//            stream << "Memory allocation failed.  Please close other applications to free up system RAM and try again. \n";
-//            ui->plainTextEdit->appendPlainText(msg);
+            stream << "Memory allocation failed.  Please close other applications to free up system RAM and try again. \n";
+            emit writeLog(msg);
             return;
 
         default:
-//            QApplication::restoreOverrideCursor();
-//            stream << "Failed to import: " << result << "\n";
-//            ui->plainTextEdit->appendPlainText(msg);
+            stream << "Failed to import: " << result << "\n";
+            emit writeLog(msg);
             return;
     }
 
     //Check if the user has imported a .hex file that doesn't contain config bits in it,
     //even though the user is planning on re-programming the config bits section.
-    if(writeConfig && (import.hasConfigBits == false) && device->hasConfig())
-    {
+    if (writeConfig && (import.hasConfigBits == false) && device->hasConfig()) {
         //The user had config bit reprogramming selected, but the hex file opened didn't have config bit
         //data in it.  We should automatically prevent config bit programming, to avoid leaving the device
         //in a broken state following the programming cycle.
         commResultCode = comm->LockUnlockConfig(true); //Lock the config bits.
-        if(commResultCode != Comm::Success)
-        {
-//            ui->plainTextEdit->appendPlainText("Unexpected internal error encountered.  Recommend restarting the application to avoid ""bricking"" the device.\n");
+        if(commResultCode != Comm::Success) {
+            emit writeLog("Unexpected internal error encountered.  Recommend restarting the application to avoid ""bricking"" the device.\n");
         }
 
-//        QMessageBox::warning(this, "Warning!", "This HEX file does not contain config bit information.\n\nAutomatically disabling config bit reprogramming to avoid leaving the device in a state that could prevent further bootloading.", QMessageBox::AcceptRole, QMessageBox::AcceptRole);
+//???        QMessageBox::warning(this, "Warning!", "This HEX file does not contain config bit information.\n\nAutomatically disabling config bit reprogramming to avoid leaving the device in a state that could prevent further bootloading.", QMessageBox::AcceptRole, QMessageBox::AcceptRole);
         writeConfig = false;
     }
 
@@ -646,21 +654,19 @@ void Bootloader::LoadFile(QString newFileName)
     return;
 }
 
-void Bootloader::GetQuery()
-{
-//    QTime totalTime;
+void Bootloader::GetQuery() {
+    QTime totalTime;
     Comm::BootInfo bootInfo;
     DeviceData::MemoryRange range;
     QString connectMsg;
-    //QTextStream ss(&connectMsg);
+    QTextStream ss(&connectMsg);
 
 
     qDebug("Executing GetQuery() command.");
 
-//    totalTime.start();
+    totalTime.start();
 
-    if(!comm->isConnected())
-    {
+    if(!comm->isConnected()){
         qWarning("Query not sent, device not connected");
         return;
     }
@@ -670,22 +676,22 @@ void Bootloader::GetQuery()
     {
         case Comm::Fail:
         case Comm::IncorrectCommand:
-//            ui->plainTextEdit->appendPlainText("Unable to communicate with device\n");
+        emit writeLog("Unable to communicate with device\n");
             return;
         case Comm::Timeout:
-//            ss << "Operation timed out";
+            ss << "Operation timed out";
             break;
         case Comm::Success:
             wasBootloaderMode = true;
-//            ss << "Device Ready";
-//            deviceLabel.setText("Connected");
+            ss << "Device Ready";
+            emit writeLog("Connected");
             break;
         default:
             return;
     }
 
-//    ss << " (" << (double)totalTime.elapsed() / 1000 << "s)\n";
-//    ui->plainTextEdit->appendPlainText(connectMsg);
+    ss << " (" << (double)totalTime.elapsed() / 1000 << "s)\n";
+    emit writeLog(connectMsg);
     deviceData->ranges.clear();
 
     //Now start parsing the bootInfo packet to learn more about the device.  The bootInfo packet contains
@@ -695,8 +701,7 @@ void Bootloader::GetQuery()
     device->bytesPerPacket = bootInfo.bytesPerPacket;
 
     //Set some processor family specific global variables that will be used elsewhere (ex: during program/verify operations).
-    switch(device->family)
-    {
+    switch(device->family){
         case Device::PIC18:
             device->bytesPerWordFLASH = 2;
             device->bytesPerAddressFLASH = 1;
@@ -724,25 +729,20 @@ void Bootloader::GetQuery()
     //reprogrammable.  We will need this information later, to decide what part(s) of the .hex file we
     //should look at/try to program into the device.  Data sections in the .hex file that are not included
     //in these regions should be ignored.
-    for(int i = 0; i < MAX_DATA_REGIONS; i++)
-    {
-        if(bootInfo.memoryRegions[i].type == END_OF_TYPES_LIST)
-        {
+    for (int i = 0; i < MAX_DATA_REGIONS; i++) {
+        if (bootInfo.memoryRegions[i].type == END_OF_TYPES_LIST) {
             //Before we quit, check the special versionFlag byte,
             //to see if the bootloader firmware is at least version 1.01.
             //If it is, then it will support the extended query command.
             //If the device is based on v1.00 bootloader firmware, it will have
             //loaded the versionFlag location with 0x00, which was a pad byte.
-            if(bootInfo.versionFlag == BOOTLOADER_V1_01_OR_NEWER_FLAG)
-            {
+            if (bootInfo.versionFlag == BOOTLOADER_V1_01_OR_NEWER_FLAG) {
                 deviceFirmwareIsAtLeast101 = true;
                 qDebug("Device bootloader firmware is v1.01 or newer and supports Extended Query.");
                 //Now fetch the extended query information packet from the USB firmware.
                 comm->ReadExtendedQueryInfo(&extendedBootInfo);
                 qDebug("Device bootloader firmware version is: " + extendedBootInfo.PIC18.bootloaderVersion);
-            }
-            else
-            {
+            } else {
                 deviceFirmwareIsAtLeast101 = false;
             }
             break;
@@ -751,28 +751,22 @@ void Bootloader::GetQuery()
         //Error check: Check the firmware's reported size to make sure it is sensible.  This ensures
         //we don't try to allocate ourselves a massive amount of RAM (capable of crashing this PC app)
         //if the firmware claimed an improper value.
-        if(bootInfo.memoryRegions[i].size > MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE)
-        {
+        if (bootInfo.memoryRegions[i].size > MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE) {
             bootInfo.memoryRegions[i].size = MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE;
         }
 
         //Parse the bootInfo response packet and allocate ourselves some RAM to hold the eventual data to program.
-        if(bootInfo.memoryRegions[i].type == PROGRAM_MEMORY)
-        {
+        if (bootInfo.memoryRegions[i].type == PROGRAM_MEMORY) {
             range.type = PROGRAM_MEMORY;
             range.dataBufferLength = bootInfo.memoryRegions[i].size * device->bytesPerAddressFLASH;
             range.pDataBuffer = new unsigned char[range.dataBufferLength];
             memset(&range.pDataBuffer[0], 0xFF, range.dataBufferLength);
-        }
-        else if(bootInfo.memoryRegions[i].type == EEPROM_MEMORY)
-        {
+        } else if(bootInfo.memoryRegions[i].type == EEPROM_MEMORY) {
             range.type = EEPROM_MEMORY;
             range.dataBufferLength = bootInfo.memoryRegions[i].size * device->bytesPerAddressEEPROM;
             range.pDataBuffer = new unsigned char[range.dataBufferLength];
             memset(&range.pDataBuffer[0], 0xFF, range.dataBufferLength);
-        }
-        else if(bootInfo.memoryRegions[i].type == CONFIG_MEMORY)
-        {
+        } else if(bootInfo.memoryRegions[i].type == CONFIG_MEMORY) {
             range.type = CONFIG_MEMORY;
             range.dataBufferLength = bootInfo.memoryRegions[i].size * device->bytesPerAddressConfig;
             range.pDataBuffer = new unsigned char[range.dataBufferLength];
