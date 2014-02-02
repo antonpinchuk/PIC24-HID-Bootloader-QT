@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setBootloadEnabled(false);
 
     //Update the file list in the File-->[import files list] area, so the user can quickly re-load a previously used .hex file.
-    //UpdateRecentFileList();
+    //UpdateRecentFileList(); // moved to setConnected()
 }
 
 MainWindow::~MainWindow()
@@ -151,7 +151,7 @@ void MainWindow::setConnected(bool connected)
     }
     ui->action_Settings->setEnabled(connected);
 
-    // Was in original project, but actually no need to do it on each connect!
+    // Was in original project, looks like because calling from constructor does not work
     UpdateRecentFileList();
 }
 

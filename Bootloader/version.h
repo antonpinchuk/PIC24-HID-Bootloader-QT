@@ -1,3 +1,3 @@
 
-#define APPLICATION "USB Bootloader"
-#define VERSION     "2.9j"
+#define APPLICATION "Viking One USB Bootloader"
+#define VERSION     "1.0"
