@@ -19,13 +19,23 @@ INCLUDEPATH += ../
 HEADERS += \
     mainwindow.h \
     updatescheduler.h \
-    updateavailabledialog.h
+    updateavailabledialog.h \
+    ../HIDBootloader/Bootloader.h \
+    ../HIDBootloader/Comm.h \
+    ../HIDBootloader/DeviceData.h \
+    ../HIDBootloader/Device.h \
+    ../HIDBootloader/ImportExportHex.h
 
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
     updatescheduler.cpp \
-    updateavailabledialog.cpp
+    updateavailabledialog.cpp \
+    ../HIDBootloader/Bootloader.cpp \
+    ../HIDBootloader/Comm.cpp \
+    ../HIDBootloader/DeviceData.cpp \
+    ../HIDBootloader/Device.cpp \
+    ../HIDBootloader/ImportExportHex.cpp
 
 FORMS += \
     mainwindow.ui \
