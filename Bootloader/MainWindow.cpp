@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusBar()->addPermanentWidget(&deviceLabel);
 
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
-//    qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
+    qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
 
     bootloader = new Bootloader();
 
@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setBootloadEnabled(false);
 
     //Update the file list in the File-->[import files list] area, so the user can quickly re-load a previously used .hex file.
-    UpdateRecentFileList();
+    //UpdateRecentFileList();
 }
 
 MainWindow::~MainWindow()
@@ -152,7 +152,7 @@ void MainWindow::setConnected(bool connected)
     ui->action_Settings->setEnabled(connected);
 
     // Was in original project, but actually no need to do it on each connect!
-    //UpdateRecentFileList();
+    UpdateRecentFileList();
 }
 
 void MainWindow::setBootloadEnabled(bool enable)

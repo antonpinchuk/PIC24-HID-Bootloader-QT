@@ -53,6 +53,7 @@ public:
 
 private slots:
     void Connection(void);
+    void commProgressBar(int newValue);
 
 protected:
     QTimer *timer;

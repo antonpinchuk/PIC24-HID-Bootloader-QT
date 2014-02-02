@@ -25,6 +25,9 @@ Bootloader::Bootloader() {
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(Connection()));
     timer->start(1000); //Check for future USB connection status changes every 1000 milliseconds.
+    //timer->moveToThread(this);
+
+    connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
 }
 
 /**
@@ -929,4 +932,8 @@ void Bootloader::log(MessageType type, QString value) {
 void Bootloader::logClear()
 {
     emit messageClear();
+}
+
+void Bootloader::commProgressBar(int newValue) {
+    emit setProgressBar(newValue);
 }
