@@ -96,7 +96,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QPlainTextEdit" name="plainTextEdit">
     <property name="geometry">
      <rect>
       <x>20</x>

@@ -8,14 +8,14 @@ TUpdateScheduler::TUpdateScheduler(QObject *parent) : QObject(parent)
 
     UpdateRequestTimer = new QTimer;
 
-    StartAppUpdateTime = 15*1000; /*10*60*1000;*/ // TODO: Вернуть правильный интервал! // 10 минут по 60 секунд по 1000 миллисекунд
+    StartAppUpdateTime = 15*1000; /*10*60*1000;*/
     SchedulerTime.setHMS(15, 0, 0);
 
-    // выполняется при старте приложения
+    // On start application
     QTimer::singleShot(StartAppUpdateTime, this, SLOT(CheckUpdate()));
 
     connect(UpdateRequestTimer, SIGNAL(timeout()), this, SLOT(CheckUpdateTime()));
-    UpdateRequestTimer->start(30*60*1000); // один раз в 30 минут тикает
+    UpdateRequestTimer->start(30*60*1000); // 30 min.
 
     connect(WebCtrl, SIGNAL(finished(QNetworkReply*)), this, SLOT(JsonFileDownloaded(QNetworkReply*)));
 }
@@ -65,7 +65,7 @@ void TUpdateScheduler::CheckCurrVersion(const QByteArray &DownloadedData)
     file.close();
 */
 
-    // TODO проверить правильность работы QString::compare при стравлении строк версий
+    // TODO Check QString::compare
     if(QString::compare(CurAppVersion, NewAppVersion) < 0){
         emit NeedUpdate(AppFile, ReleaseNotes);
     }

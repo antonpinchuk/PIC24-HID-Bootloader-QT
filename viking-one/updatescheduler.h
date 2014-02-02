@@ -22,7 +22,7 @@ class TUpdateScheduler : public QObject
     Q_OBJECT
 
 private:
-    QString UpdateJsonUrl; // адрес сайта, откуда брать файл с инфой об обновлении
+    QString UpdateJsonUrl; //Update URL
 
     QNetworkAccessManager* WebCtrl;
 
