@@ -117,9 +117,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setConnected(false);
     setBootloadEnabled(false);
 
-
     //Update the file list in the File-->[import files list] area, so the user can quickly re-load a previously used .hex file.
-    //UpdateRecentFileList(); ---> not need
+    UpdateRecentFileList();
 }
 
 MainWindow::~MainWindow()
@@ -153,7 +152,6 @@ void MainWindow::setConnected(bool connected)
         deviceLabel.setText("Disconnected");
     }
     ui->action_Settings->setEnabled(connected);
-    UpdateRecentFileList();
 }
 
 void MainWindow::setBootloadEnabled(bool enable)
