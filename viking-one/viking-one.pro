@@ -50,10 +50,10 @@ RESOURCES += \
 # Add the correct HIDAPI library according to what
 # OS is being used
 #-------------------------------------------------
-#win32: LIBS += -L../HIDAPI/windows
-#macx: LIBS += -L../HIDAPI/mac
-#unix: !macx: LIBS += -L../HIDAPI/linux
-#LIBS += -lHIDAPI
+win32: LIBS += -L../HIDAPI/windows
+macx: LIBS += -L../HIDAPI/mac
+unix: !macx: LIBS += -L../HIDAPI/linux
+LIBS += -lHIDAPI
 
 #-------------------------------------------------
 # Make sure to add the required libraries or
