@@ -24,7 +24,7 @@ signals:
     void setBootloadEnabled(bool enable);
     void setBootloadBusy(bool busy);
     void setProgressBar(int newValue);
-    void message(MessageType type, QString value);
+    void message(Bootloader::MessageType type, QString value);
     void messageClear();
 
 public:    
