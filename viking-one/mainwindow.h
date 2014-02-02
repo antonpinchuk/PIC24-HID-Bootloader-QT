@@ -5,6 +5,7 @@
 #include <QSystemTrayIcon>
 #include <QIcon>
 #include <QMenu>
+#include <QtWidgets/QFileDialog>
 
 #include "updatescheduler.h"
 #include "updateavailabledialog.h"
@@ -30,6 +31,7 @@ private:
     UpdateAvailableDialog *updateAvailableDialog;
 
     QMenu*   SystemTrayMenu;
+    QString fileName;
 protected:
      void changeEvent( QEvent * event );
 
@@ -37,6 +39,8 @@ private slots:
     void TrayIcoClick(QSystemTrayIcon::ActivationReason Reason);
     void NeedUpdate(QString AppFile, QString ReleaseNotes);
     void Exit();
+
+    void on_WriteRunePackBtn_clicked();
 };
 //------------------------------------------------------------------------------------------------------------//
 #endif // MAINWINDOW_H

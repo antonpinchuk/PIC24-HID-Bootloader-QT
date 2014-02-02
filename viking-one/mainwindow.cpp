@@ -77,3 +77,17 @@ void MainWindow::Exit()
     QCoreApplication::exit();
 }
 //------------------------------------------------------------------------------------------------------------//
+
+void MainWindow::on_WriteRunePackBtn_clicked()
+{
+    QString msg, newFileName;
+    QTextStream stream(&msg);
+
+    newFileName = QFileDialog::getOpenFileName(this, "Open Hex File", fileName, "Hex Files (*.hex *.ehx)");
+
+    if (newFileName.isEmpty()) {
+        return;
+    }
+
+    //LoadFile(newFileName);
+}
