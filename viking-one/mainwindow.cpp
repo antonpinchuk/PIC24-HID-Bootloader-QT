@@ -12,11 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     SystemTrayMenu        = new QMenu("tray menu");
 
 
-    QAction* checkUpdateAction = SystemTrayMenu->addAction("check update");
-    QAction* quitAction        = SystemTrayMenu->addAction("quit");
+    checkUpdateAction = SystemTrayMenu->addAction("Check for updates");
+    checkUploadFirmware = SystemTrayMenu->addAction("Upload firmware");
+    quitAction = SystemTrayMenu->addAction("Quit");
 
     connect(quitAction       , SIGNAL(triggered()), this, SLOT(Exit()) );
     connect(checkUpdateAction, SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
+    connect(checkUploadFirmware, SIGNAL(triggered()), this, SLOT(UploadFirmware()) );
 
     Ico = new QSystemTrayIcon(this);
     Ico->setIcon(QIcon(":/new/ico/app.ico"));
@@ -90,6 +92,31 @@ void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
     }
 }
 //------------------------------------------------------------------------------------------------------------//
+void MainWindow::UploadFirmware()
+{
+    QString newFileName;
+    HexImporter::ErrorCode result;
+    onMessageClear();
+
+    newFileName = QFileDialog::getOpenFileName(this, "Open Hex File", fileName, "Hex Files (*.hex *.ehx)");
+
+    if (newFileName.isEmpty()) {
+        return;
+    }
+    result = bootloader->LoadFile(newFileName);
+
+    if (result == HexImporter::Success) {
+
+        future = QtConcurrent::run(bootloader, &Bootloader::WriteDevice);
+
+        onMessage(Bootloader::Info, "Starting Erase/Program/Verify Sequence.");
+        onMessage(Bootloader::Info, "Do not unplug device or disconnect power until the operation is fully complete.");
+        onMessage(Bootloader::Info, " ");
+    }
+
+    QApplication::restoreOverrideCursor();
+}
+//------------------------------------------------------------------------------------------------------------//
 void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
 {
     updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
@@ -104,6 +131,9 @@ void MainWindow::enabledBtn(bool enable)
 {
     ui->WriteRunePackBtn->setEnabled(enable);
     ui->ReadRunePackBtn->setEnabled(enable);
+
+    /* System Tray*/
+    checkUploadFirmware->setEnabled(enable);
 }
 //------------------------------------------------------------------------------------------------------------//
 void MainWindow::setConnected(bool connected)

@@ -40,12 +40,18 @@ private:
     QFuture<void> future;
 
     Bootloader  *bootloader;
+
+    QAction* checkUpdateAction;
+    QAction* checkUploadFirmware;
+    QAction* quitAction;
+
 protected:
      void changeEvent( QEvent * event );
 
 private slots:
     void TrayIcoClick(QSystemTrayIcon::ActivationReason Reason);
-    void NeedUpdate(QString AppFile, QString ReleaseNotes);
+    void UploadFirmware();
+    void NeedUpdate(QString AppFile, QString ReleaseNotes);    
     void Exit();
 
     /* Bootloader event */
