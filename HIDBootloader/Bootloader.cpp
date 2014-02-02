@@ -242,11 +242,11 @@ void Bootloader::GetQuery()
     //Make sure user has allowed at least one region to be programmed
     if(!(writeFlash || writeEeprom || writeConfig))
     {
-        setBootloadEnabled(false);
+        emit setBootloadEnabled(false);
         //ui->action_Settings->setEnabled(true);
     }
     else
-        setBootloadEnabled(true);
+        emit setBootloadEnabled(true);
 }
 
 

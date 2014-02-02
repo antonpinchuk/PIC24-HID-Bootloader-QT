@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusBar()->addPermanentWidget(&deviceLabel);
 
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
-    qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
+//    qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
 
     bootloader = new Bootloader();
 
@@ -66,27 +66,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
-
-
-//    //Make initial check to see if the USB device is attached
-//    bootloader->comm->PollUSB();
-//    if(bootloader->comm->isConnected())
-//    {
-//        qWarning("Attempting to open device...");
-//        bootloader->comm->open();
-//        ui->plainTextEdit->setPlainText("Device Attached.");
-//        ui->plainTextEdit->appendPlainText("Connecting...");
-//        bootloader->GetQuery();
-//    }
-//    else
-//    {
-//        ui->plainTextEdit->appendPlainText("Device not detected.  Verify device is attached and in firmware update mode.");
-//        deviceLabel.setText("Disconnected");
-//        bootloader->hexOpen = false;
-//        setBootloadEnabled(false);
-//        emit SetProgressBar(0);
-//    }
-    // Disconnected by default, if device attached bootloader will update UI in 1 sec
 
 
     fileWatcher = NULL;
@@ -114,6 +93,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     bootloader->eraseDuringWrite = true;
     settings.endGroup();
 
+    //    //Make initial check to see if the USB device is attached
+    //    bootloader->comm->PollUSB();
+    //    if(bootloader->comm->isConnected())
+    //    {
+    //        qWarning("Attempting to open device...");
+    //        bootloader->comm->open();
+    //        ui->plainTextEdit->setPlainText("Device Attached.");
+    //        ui->plainTextEdit->appendPlainText("Connecting...");
+    //        bootloader->GetQuery();
+    //    }
+    //    else
+    //    {
+    //        ui->plainTextEdit->appendPlainText("Device not detected.  Verify device is attached and in firmware update mode.");
+    //        deviceLabel.setText("Disconnected");
+    //        bootloader->hexOpen = false;
+    //        setBootloadEnabled(false);
+    //        emit SetProgressBar(0);
+    //    }
+    // Disconnected by default, if device attached bootloader will update UI in 1 sec
     setConnected(false);
     setBootloadEnabled(false);
 
@@ -152,6 +150,9 @@ void MainWindow::setConnected(bool connected)
         deviceLabel.setText("Disconnected");
     }
     ui->action_Settings->setEnabled(connected);
+
+    // Was in original project, but actually no need to do it on each connect!
+    //UpdateRecentFileList();
 }
 
 void MainWindow::setBootloadEnabled(bool enable)
