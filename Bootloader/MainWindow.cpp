@@ -202,7 +202,7 @@ void MainWindow::onMessage(Bootloader::MessageType type, QString value) {
         QMessageBox::critical(this, "Error!", value, QMessageBox::AcceptRole, QMessageBox::AcceptRole);
         value = "Error: " + value;
     }
-    ui->plainTextEdit->setPlainText(value);
+    ui->plainTextEdit->appendPlainText(value);
 }
 
 void MainWindow::onMessageClear() {
