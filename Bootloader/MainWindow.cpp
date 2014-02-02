@@ -87,8 +87,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 //        emit SetProgressBar(0);
 //    }
     // Disconnected by default, if device attached bootloader will update UI in 1 sec
-    setConnected(false);
-    setBootloadEnabled(false);
 
 
     fileWatcher = NULL;
@@ -116,8 +114,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     bootloader->eraseDuringWrite = true;
     settings.endGroup();
 
+    setConnected(false);
+    setBootloadEnabled(false);
+
+
     //Update the file list in the File-->[import files list] area, so the user can quickly re-load a previously used .hex file.
-    UpdateRecentFileList();
+    //UpdateRecentFileList(); ---> not need
 }
 
 MainWindow::~MainWindow()
