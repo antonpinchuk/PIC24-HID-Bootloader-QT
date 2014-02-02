@@ -69,7 +69,6 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------------------------------------//
 void MainWindow::changeEvent( QEvent * event )
 {
-    // упрятывание приложения в трей
     if(event->type() == QEvent::WindowStateChange) {
         if(isMinimized()) {
             this->hide();
