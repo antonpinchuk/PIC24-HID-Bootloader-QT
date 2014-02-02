@@ -66,6 +66,8 @@ protected:
     Comm::ErrorCode RemapInterruptVectors(Device* device, DeviceData* deviceData);
 
 private:
+    bool pollUsbEnabled;
+
     DeviceData* deviceData;
     DeviceData* hexData;
 

@@ -25,7 +25,8 @@ Bootloader::Bootloader() {
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(Connection()));
     timer->start(1000); //Check for future USB connection status changes every 1000 milliseconds.
-    //timer->moveToThread(this);
+    pollUsbEnabled = true;
+    //timer->moveToThread(this); // why does not work?
 
     connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
 }
@@ -46,6 +47,10 @@ Bootloader::~Bootloader() {
 
 
 void Bootloader::Connection(void) {
+    if (!pollUsbEnabled) {
+        return;
+    }
+
     bool currStatus = comm->isConnected();
     Comm::ErrorCode result;
 
@@ -882,7 +887,9 @@ HexImporter::ErrorCode Bootloader::LoadFile(QString newFileName)
 
 
 void Bootloader::IoWithDeviceStarted(QString msg) {
-    timer->stop();
+    //Causes error: QObject::killTimer: timers cannot be stopped from another thread
+    //timer->stop();
+    pollUsbEnabled = false;
 
     log(msg);
     emit setBootloadBusy(true);
@@ -891,7 +898,9 @@ void Bootloader::IoWithDeviceStarted(QString msg) {
 void Bootloader::IoWithDeviceCompleted(QString msg, Comm::ErrorCode result, double time) {
     QTextStream ss(&msg);
 
-    timer->start(1000);
+    //QObject::startTimer: timers cannot be started from another thread
+    //timer->start(1000);
+    pollUsbEnabled = true;
 
     switch(result)
     {
