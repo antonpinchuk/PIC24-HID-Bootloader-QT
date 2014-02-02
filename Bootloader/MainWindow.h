@@ -36,11 +36,9 @@
 #include <QFuture>
 
 #include "HIDBootloader/Bootloader.h"
-#include "HIDBootloader/Comm.h"
-#include "HIDBootloader/DeviceData.h"
-#include "HIDBootloader/Device.h"
-#include "HIDBootloader/ImportExportHex.h"
-
+//#include "HIDBootloader/Comm.h"
+//#include "HIDBootloader/DeviceData.h"
+//#include "HIDBootloader/Device.h"
 
 
 namespace Ui
@@ -58,37 +56,24 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    Bootloader *mBootloader;
+    Bootloader *bootloader;
 
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void GetQuery(void);
-    void LoadFile(QString fileName);
-
-    void setBootloadBusy(bool busy);
-
 signals:
     void AppendString(QString msg);
-    void SetProgressBar(int newValue);
 
 public slots:
     void openRecentFile(void);
-    void UpdateProgressBar(int newValue);
 
 protected:
-
     QFuture<void> future;
 
     QString fileName, watchFileName;
     QFileSystemWatcher* fileWatcher;
-    QTimer *timer;
-
-    void setBootloadEnabled(bool enable);
 
     void UpdateRecentFileList(void);
-
-    Comm::ErrorCode RemapInterruptVectors(Device* device, DeviceData* deviceData);
 
 private:
     Ui::MainWindowClass *ui;
@@ -99,10 +84,16 @@ private:
 
     bool wasBootloaderMode;
 
-private slots:
-        void writeLog(QString value);
+    void LoadFile(QString fileName);
 
 private slots:
+    void setConnected(bool enable);
+    void setBootloadEnabled(bool enable);
+    void setBootloadBusy(bool busy);
+    void updateProgressBar(int newValue);
+    void onMessage(Bootloader::MessageType type, QString value);
+    void onMessageClear();
+
     void on_actionBlank_Check_triggered();
     void on_actionReset_Device_triggered();
     void on_action_Settings_triggered();

@@ -6,46 +6,39 @@
 #include "ImportExportHex.h"
 #include "Comm.h"
 
-/*!
- * Provides HID bootloader communication.
+/**
+ * Bootloader
+ *
+ * Implements Microchip bootloader protocol, sends signals about connection and progress state
  */
 class Bootloader : public QObject {
     Q_OBJECT
 
-
+public:
+    enum MessageType {
+        Info = 0, Warning, Error, Other = 0xFF
+    };
 
 signals:
-   void writeLog(QString value);
-   void setBootloadBusy(bool value);
-
-protected:
-    Comm::ExtendedQueryInfo extendedBootInfo;
-
-    void IoWithDeviceStart(QString msg);
-    void IoWithDeviceComplet(QString msg, Comm::ErrorCode result, double time);
-
-
-    QString fileName, watchFileName;
-
-public slots:
-    void Connection(void);
-
+    void setConnected(bool enable);
+    void setBootloadEnabled(bool enable);
+    void setBootloadBusy(bool busy);
+    void setProgressBar(int newValue);
+    void message(MessageType type, QString value);
+    void messageClear();
 
 public:    
-
     Comm* comm;
-    DeviceData* deviceData;
-    DeviceData* hexData;
     Device* device;
 
-    bool deviceFirmwareIsAtLeast101;
+    bool hexOpen;
+
     bool writeFlash;
     bool writeEeprom;
     bool writeConfig;
-    bool eraseDuringWrite;
-    bool hexOpen;
 
     bool wasBootloaderMode;
+    bool eraseDuringWrite;
 
     void GetQuery(void);
     void EraseDevice(void);
@@ -53,10 +46,33 @@ public:
     void WriteDevice(void);
     void VerifyDevice(void);
 
-    void LoadFile(QString fileName);
+    HexImporter::ErrorCode LoadFile(QString fileName);
 
     explicit Bootloader();
     ~Bootloader();
+
+private slots:
+    void Connection(void);
+
+protected:
+    QTimer *timer;
+
+    Comm::ExtendedQueryInfo extendedBootInfo;
+
+    void IoWithDeviceStarted(QString msg);
+    void IoWithDeviceCompleted(QString msg, Comm::ErrorCode result, double time);
+
+    Comm::ErrorCode RemapInterruptVectors(Device* device, DeviceData* deviceData);
+
+private:
+    DeviceData* deviceData;
+    DeviceData* hexData;
+
+    bool deviceFirmwareIsAtLeast101;
+
+    void log(QString value);
+    void log(MessageType type, QString value);
+    void logClear();
 
 };
 
