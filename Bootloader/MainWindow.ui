@@ -71,6 +71,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionSaveMemoryRange"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -115,11 +116,13 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionSaveMemoryRange"/>
    <addaction name="separator"/>
    <addaction name="actionWrite_Device"/>
    <addaction name="action_Verify_Device"/>
    <addaction name="actionErase_Device"/>
    <addaction name="actionBlank_Check"/>
+   <addaction name="actionRead_Device"/>
    <addaction name="actionReset_Device"/>
    <addaction name="separator"/>
   </widget>
@@ -233,6 +236,39 @@
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionSaveMemoryRange">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/MainWindow/img/SAVE.BMP</normaloff>:/MainWindow/img/SAVE.BMP</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save Memory Range</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Memory Range</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionRead_Device">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/MainWindow/img/verify.png</normaloff>:/MainWindow/img/verify.png</iconset>
+   </property>
+   <property name="text">
+    <string>ReadDevice</string>
+   </property>
+   <property name="toolTip">
+    <string>Read Device</string>
    </property>
   </action>
  </widget>

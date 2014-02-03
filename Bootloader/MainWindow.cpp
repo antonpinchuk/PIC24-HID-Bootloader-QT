@@ -457,3 +457,13 @@ void MainWindow::UpdateRecentFileList(void)
     }
 }
 
+
+void MainWindow::on_actionSaveMemoryRange_triggered()
+{
+
+}
+
+void MainWindow::on_actionRead_Device_triggered()
+{
+
+}
