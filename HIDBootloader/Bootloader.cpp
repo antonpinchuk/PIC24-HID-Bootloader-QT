@@ -27,7 +27,7 @@ Bootloader::Bootloader() {
 
     connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
 
-    _rangesReadWrite.append(null);
+    //_rangesReadWrite.append(null);
 }
 
 /**
@@ -46,28 +46,26 @@ Bootloader::~Bootloader() {
     //delete _rangesReadWrite;
 }
 
-QString Bootloader::GetMemoryRangeNameByType(int value){
-    switch(value){
+QString Bootloader::GetMemoryRangeNameByType(int value) {
+    switch (value) {
         case ALL_MEMORY_RANGES:
-                return "All ranges";
+            return "All ranges";
             break;
         case PROGRAM_MEMORY:
-                return "Program memory";
+            return "Program memory";
             break;
         case EEPROM_MEMORY:
-                return "EEPROM";
+            return "EEPROM";
             break;
-        case EEPROM_RUNE_MEMORY:
-                return "EEPROM rune data";
-            break;
-        case EEPROM_USER_PROGRAM_MEMORY:
-                return "EEPROM user program data";
-            break;
+//        case EEPROM_RUNE_MEMORY:
+//            return "EEPROM rune data";
+//            break;
+//        case EEPROM_USER_PROGRAM_MEMORY:
+//            return "EEPROM user program data";
+//            break;
         case CONFIG_MEMORY:
-                return "Config bits";
+            return "Config bits";
             break;
-
-
     }
     return NULL;
 }
