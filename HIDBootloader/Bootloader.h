@@ -52,6 +52,7 @@ public:
     void BlankCheckDevice(void);
     void WriteDevice(void);
     void VerifyDevice(void);
+    void ReadDevice(void);
 
     HexImporter::ErrorCode LoadFile(QString fileName);
 

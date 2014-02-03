@@ -110,6 +110,8 @@ private slots:
     void on_actionOpen_triggered();
     void on_actionErase_Device_triggered();
     void on_actionExit_triggered();
+    void on_actionSaveMemoryRange_triggered();
+    void on_actionRead_Device_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -199,7 +199,7 @@ void MainWindow::uploadFirmware(unsigned char range)
         onMessage(Bootloader::Info, "Do not unplug device or disconnect power until the operation is fully complete.");
         onMessage(Bootloader::Info, " ");
 
-        //bootloader->rangeReadWrite = range;
+        bootloader->rangeReadWrite = range;
 
         future = QtConcurrent::run(bootloader, &Bootloader::WriteDevice);
     }

@@ -357,6 +357,13 @@ Comm::ErrorCode Comm::GetData(unsigned long address, unsigned char bytesPerPacke
     unsigned int percentCompletion;
     unsigned int addressesToFetch = endAddress - address;
 
+    //Error check input parameters before using them
+    if((pData == NULL) || (bytesPerAddress == 0) || (address > endAddress) || (bytesPerWord == 0))
+    {
+        qWarning("Bad parameters specified when calling Program() function.");
+        return Fail;
+    }
+
     //Check to avoid possible division by zero when computing the percentage completion status.
     if(addressesToFetch == 0)
         addressesToFetch++;
