@@ -7,8 +7,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->setWindowTitle(APPLICATION_VERSION);
+
     WebCtrl = new QNetworkAccessManager(this);
 
+    // default path to updater
     FileUrl = "http://www.viking360.com/downloads/xbox-one/berserker/file";
     if(QApplication::arguments().size() > 1){
         FileUrl = QApplication::arguments().at(1);
@@ -63,7 +66,11 @@ void MainWindow::FileDownloaded(QNetworkReply* Reply)
     File.write(DownloadedData);
     File.close();
 
-    QProcess::startDetached(QUserUpdatesDir + FileName);
+    QStringList Arguments;
+    Arguments << "VERYSILENT";
+    Arguments << "CLOSEAPPLICATIONS";
+
+    QProcess::startDetached(QUserUpdatesDir + FileName, Arguments);
 
     this->close();
     QCoreApplication::exit();
