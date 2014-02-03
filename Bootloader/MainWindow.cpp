@@ -56,10 +56,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusBar()->addPermanentWidget(&deviceLabel);
 
     labelMemoryRanges.setText("Memory Range: ");
-    comboMemoryRanges.setMinimumWidth(100);
+    comboMemoryRanges.setMinimumWidth(240);
     ui->mainToolBar->addWidget(&labelMemoryRanges);
     ui->mainToolBar->addWidget(&comboMemoryRanges);
     comboMemoryRanges.addItem("All reanges",QVariant(0));
+    connect(&comboMemoryRanges , SIGNAL(currentIndexChanged(int)),this,SLOT(onChangedMemoryRanges(int)));
 
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
     qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
@@ -148,16 +149,25 @@ MainWindow::~MainWindow()
     delete bootloader;
 }
 
+void MainWindow::onChangedMemoryRanges(int value)
+{
+    bootloader->rangeReadWrite = comboMemoryRanges.itemData(value).toInt();
+}
 
 void MainWindow::setConnected(bool connected)
 {
     if (connected) {
         deviceLabel.setText("Connected");
+
         comboMemoryRanges.clear();
         comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(ALL_MEMORY_RANGES),QVariant(ALL_MEMORY_RANGES));
-        for(int i = 0;i < bootloader->deviceData->ranges.size() ;i++){
-           comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(bootloader->deviceData->ranges[i].type),
-                                     QVariant(bootloader->deviceData->ranges[i].type));
+        for (int i = 0;i < bootloader->deviceData->ranges.size() ;i++) {
+           QString memoryRangeName = bootloader->GetMemoryRangeNameByType(bootloader->deviceData->ranges[i].type);
+           QString memoryRangeStartHex =  QString::number(bootloader->deviceData->ranges[i].start, 16).toUpper();
+           QString memoryRangeEndHex = QString::number(bootloader->deviceData->ranges[i].end, 16).toUpper();
+
+           QString formattedString = QString("[0x%1]-[0x%2] %3").arg(memoryRangeStartHex).arg(memoryRangeEndHex).arg(memoryRangeName);
+           comboMemoryRanges.addItem(formattedString, QVariant(i));
         }
     } else {
         deviceLabel.setText("Disconnected");
