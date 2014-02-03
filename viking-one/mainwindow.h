@@ -65,6 +65,9 @@ private slots:
     void onMessage(Bootloader::MessageType type, QString value);
     void onMessageClear();
 
+    void onReadComplite();
+    void onWriteComplite();
+
     void on_WriteRunePackBtn_clicked();
 };
 

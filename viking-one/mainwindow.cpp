@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setFixedSize(this->minimumWidth(),this->minimumHeight());
 
     ui->CheckVersionBtn->setVisible(false); // test check version button
 
@@ -55,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
+    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplite()));
+    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplite()));
 
     setConnected(false);
     setBootloadEnabled(false);
@@ -150,6 +153,16 @@ void MainWindow::onMessage(Bootloader::MessageType type, QString value) {
 
 void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
+}
+
+void MainWindow::onReadComplite()
+{
+
+}
+
+void MainWindow::onWriteComplite()
+{
+
 }
 
 
