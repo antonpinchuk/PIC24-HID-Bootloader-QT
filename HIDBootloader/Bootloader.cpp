@@ -52,7 +52,7 @@ QString Bootloader::GetMemoryRangeNameByType(int value) {
             return "All ranges";
             break;
         case PROGRAM_MEMORY:
-            return "Program memory";
+            return "Program";
             break;
         case EEPROM_MEMORY:
             return "EEPROM";
@@ -64,7 +64,7 @@ QString Bootloader::GetMemoryRangeNameByType(int value) {
 //            return "EEPROM user program data";
 //            break;
         case CONFIG_MEMORY:
-            return "Config bits";
+            return "Config";
             break;
     }
     return NULL;
