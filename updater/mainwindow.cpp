@@ -68,8 +68,8 @@ void MainWindow::FileDownloaded(QNetworkReply* Reply)
     File.close();
 
     QStringList Arguments;
-    Arguments << "/VERYSILENT";
-    Arguments << "/CLOSEAPPLICATIONS";
+    // Arguments << "/VERYSILENT";
+    // Arguments << "/CLOSEAPPLICATIONS";
 
     QProcess::startDetached(QUserUpdatesDir + FileName, Arguments);
 

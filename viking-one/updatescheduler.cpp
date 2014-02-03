@@ -8,7 +8,7 @@ TUpdateScheduler::TUpdateScheduler(QObject *parent) : QObject(parent)
 
     UpdateRequestTimer = new QTimer;
 
-    StartAppUpdateTime = 10*1000; /*10*60*1000*/; // wait 10 minutes and check update time
+    StartAppUpdateTime = 6*60*1000; // wait 6 minutes and check update time
     SchedulerTime.setHMS(15, 0, 0);
 
     // On start application
