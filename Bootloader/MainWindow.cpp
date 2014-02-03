@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusBar()->addPermanentWidget(&deviceLabel);
 
     labelMemoryRanges.setText("Memory Range: ");
-    comboMemoryRanges.setMinimumWidth(240);
+    comboMemoryRanges.setMinimumWidth(200);
     ui->mainToolBar->addWidget(&labelMemoryRanges);
     ui->mainToolBar->addWidget(&comboMemoryRanges);
     comboMemoryRanges.addItem("All reanges",QVariant(0));
@@ -159,9 +159,10 @@ void MainWindow::setConnected(bool connected)
     if (connected) {
         deviceLabel.setText("Connected");
 
+        // Ranges
         comboMemoryRanges.clear();
         comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(ALL_MEMORY_RANGES),QVariant(ALL_MEMORY_RANGES));
-        for (int i = 0;i < bootloader->deviceData->ranges.size() ;i++) {
+        for (int i = 0; i < bootloader->deviceData->ranges.size(); i++) {
            QString memoryRangeName = bootloader->GetMemoryRangeNameByType(bootloader->deviceData->ranges[i].type);
            QString memoryRangeStartHex =  QString::number(bootloader->deviceData->ranges[i].start, 16).toUpper();
            QString memoryRangeEndHex = QString::number(bootloader->deviceData->ranges[i].end, 16).toUpper();
@@ -395,7 +396,7 @@ void MainWindow::LoadFile(QString newFileName)
 {
     HexImporter::ErrorCode result;
 
-    QApplication::restoreOverrideCursor();
+    QApplication::setOverrideCursor(Qt::BusyCursor);
 
     result = bootloader->LoadFile(newFileName);
 
@@ -441,7 +442,7 @@ void MainWindow::UpdateRecentFileList(void)
     QString text;
     int i;
 
-    for(i = 0; i < recentFileCount; i++)
+    for (i = 0; i < recentFileCount; i++)
     {
         text = tr("&%1 %2").arg(i + 1).arg(QFileInfo(files[i]).fileName());
 

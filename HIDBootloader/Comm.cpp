@@ -642,8 +642,6 @@ Comm::ErrorCode Comm::SignFlash(void)
     QTime elapsed;
     WritePacket sendPacket;
     ErrorCode status;
-    unsigned int i;
-    unsigned long int bytesRead = 0;
     BootInfo QueryInfoBuffer;
 
     qDebug("Sending SIGN_FLASH command...");

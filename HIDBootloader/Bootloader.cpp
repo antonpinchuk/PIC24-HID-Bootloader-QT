@@ -26,8 +26,6 @@ Bootloader::Bootloader() {
     //timer->moveToThread(this); // why does not work?
 
     connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
-
-    //_rangesReadWrite.append(null);
 }
 
 /**
@@ -42,32 +40,6 @@ Bootloader::~Bootloader() {
     delete device;
 
     delete timer;
-
-    //delete _rangesReadWrite;
-}
-
-QString Bootloader::GetMemoryRangeNameByType(int value) {
-    switch (value) {
-        case ALL_MEMORY_RANGES:
-            return "All ranges";
-            break;
-        case PROGRAM_MEMORY:
-            return "Program";
-            break;
-        case EEPROM_MEMORY:
-            return "EEPROM";
-            break;
-//        case EEPROM_RUNE_MEMORY:
-//            return "EEPROM rune data";
-//            break;
-//        case EEPROM_USER_PROGRAM_MEMORY:
-//            return "EEPROM user program data";
-//            break;
-        case CONFIG_MEMORY:
-            return "Config";
-            break;
-    }
-    return NULL;
 }
 
 
@@ -329,15 +301,20 @@ void Bootloader::VerifyDevice()
     unsigned char flashData[MAX_ERASE_BLOCK_SIZE];
     unsigned char hexEraseBlockData[MAX_ERASE_BLOCK_SIZE];
     unsigned long int startOfEraseBlock;
-    QList<DeviceData::MemoryRange> deviceDataRanges = _getRangesReadWrite(deviceData->ranges);
 
     //Initialize an erase block sized buffer with 0xFF.
     //Used later for post SIGN_FLASH verify operation.
     memset(&hexEraseBlockData[0], 0xFF, MAX_ERASE_BLOCK_SIZE);
 
     IoWithDeviceStarted("Verifying Device...");
-    foreach(deviceRange, deviceDataRanges)
+    for (int k = 0; k < deviceData->ranges.size(); k++)
     {
+        deviceRange = deviceData->ranges[k];
+
+        if (rangeReadWrite != ALL_MEMORY_RANGES && rangeReadWrite != k) {
+            continue; // Process single range only if selected
+        }
+
         if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
         {
             elapsed.start();
@@ -663,7 +640,6 @@ void Bootloader::WriteDevice(void)
     QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange hexRange;
-    QList<DeviceData::MemoryRange> hexDataRanges = _getRangesReadWrite(hexData->ranges);
 
     //Update the progress bar so the user knows things are happening.
     emit setProgressBar(3);
@@ -674,9 +650,15 @@ void Bootloader::WriteDevice(void)
     //we parsed the user's .hex file.
 
     IoWithDeviceStarted("Writing Device...");
-    foreach(hexRange, hexDataRanges)
+    for (int k = 0; k < hexData->ranges.size(); k++)
     {
-        if(writeFlash && (hexRange.type == PROGRAM_MEMORY))
+        hexRange = hexData->ranges[k];
+
+        if (rangeReadWrite != ALL_MEMORY_RANGES && rangeReadWrite != k) {
+            continue; // Process single range only if selected
+        }
+
+        if (writeFlash && (hexRange.type == PROGRAM_MEMORY))
         {
             //IoWithDeviceStarted("Writing Device Program Memory...");
             elapsed.start();
@@ -689,7 +671,7 @@ void Bootloader::WriteDevice(void)
                                    hexRange.end,
                                    hexRange.pDataBuffer);
         }
-        else if(writeEeprom && (hexRange.type ==  EEPROM_MEMORY))
+        else if (writeEeprom && (hexRange.type ==  EEPROM_MEMORY))
         {
                 //IoWithDeviceStarted("Writing Device EEPROM Memory...");
                 elapsed.start();
@@ -702,7 +684,7 @@ void Bootloader::WriteDevice(void)
                                        hexRange.end,
                                        hexRange.pDataBuffer);
         }
-        else if(writeConfig && (hexRange.type == CONFIG_MEMORY))
+        else if (writeConfig && (hexRange.type == CONFIG_MEMORY))
         {
             //IoWithDeviceStarted("Writing Device Config Words...");
             elapsed.start();
@@ -740,12 +722,17 @@ void Bootloader::BlankCheckDevice(void)
     QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange deviceRange;
-    QList<DeviceData::MemoryRange> deviceDataRanges = _getRangesReadWrite(deviceData->ranges);
 
     elapsed.start();
 
-    foreach(deviceRange, deviceDataRanges)
+    for (int k = 0; k < deviceData->ranges.size(); k++)
     {
+        deviceRange = hexData->ranges[k];
+
+        if (rangeReadWrite != ALL_MEMORY_RANGES && rangeReadWrite != k) {
+            continue; // Process single range only if selected
+        }
+
         if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
         {
             IoWithDeviceStarted("Blank Checking Device's Program Memory...");
@@ -981,12 +968,27 @@ void Bootloader::commProgressBar(int newValue) {
     emit setProgressBar(newValue);
 }
 
-QList<DeviceData::MemoryRange> Bootloader::_getRangesReadWrite(QList<DeviceData::MemoryRange> allRanges)
-{
-    if (rangeReadWrite == ALL_MEMORY_RANGES) {
-        return allRanges;
-    }
-    _rangesReadWrite[0] = allRanges[rangeReadWrite];
 
-    return _rangesReadWrite; // return list with single selected range
+QString Bootloader::GetMemoryRangeNameByType(int value) {
+    switch (value) {
+        case ALL_MEMORY_RANGES:
+            return "All ranges";
+            break;
+        case PROGRAM_MEMORY:
+            return "Program";
+            break;
+        case EEPROM_MEMORY:
+            return "EEPROM";
+            break;
+//        case EEPROM_RUNE_MEMORY:
+//            return "EEPROM rune data";
+//            break;
+//        case EEPROM_USER_PROGRAM_MEMORY:
+//            return "EEPROM user program data";
+//            break;
+        case CONFIG_MEMORY:
+            return "Config";
+            break;
+    }
+    return NULL;
 }
