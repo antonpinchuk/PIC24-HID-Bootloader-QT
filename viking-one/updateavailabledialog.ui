@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>New version available</string>
+   <string>XBOX One Berserker - New version available</string>
   </property>
   <property name="windowIcon">
    <iconset resource="res.qrc">
@@ -98,7 +98,7 @@
    <sender>RemindMeLaterBtn</sender>
    <signal>clicked()</signal>
    <receiver>UpdateAvailableDialog</receiver>
-   <slot>close()</slot>
+   <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>309</x>
