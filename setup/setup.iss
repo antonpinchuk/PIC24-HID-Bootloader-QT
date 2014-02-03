@@ -1,5 +1,6 @@
 [Dirs]
 Name: "{app}\updates"
+Name: "{app}\platforms"
 
 [Files]
 Source: "D:\Work\Viking\setup\bin\app.ico"; DestDir: "{app}"; Flags: ignoreversion
@@ -15,10 +16,13 @@ Source: "D:\Work\Viking\setup\bin\Qt5Network.dll"; DestDir: "{app}"; Flags: igno
 Source: "D:\Work\Viking\setup\bin\Qt5Widgets.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Work\Viking\setup\bin\viking-one.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Work\Viking\setup\bin\viking-upd.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Work\Viking\setup\bin\platforms\qminimal.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
+Source: "D:\Work\Viking\setup\bin\platforms\qoffscreen.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
+Source: "D:\Work\Viking\setup\bin\platforms\qwindows.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
 
 [Setup]
 AppName=Berserker Modded Controller Software
-AppVersion=0.0.1.1401301400
+AppVersion=0.0.2.1402031300
 DefaultDirName={pf}\viking-one\
 OutputBaseFilename=viking-one-setup
 AllowRootDirectory=True
@@ -35,4 +39,4 @@ Name: "{commondesktop}\viking one"; Filename: "{app}\viking-one.exe"; IconFilena
 Name: "{commonstartup}\viking one"; Filename: "{app}\viking-one.exe"; IconFilename: "{app}\app.ico"; IconIndex: 0; Tasks: autorunicon 
 
 [Run]
-Filename: "{app}\viking-one.exe"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
+Filename: "{app}\viking-one.exe"; Description: "Launch application"; Flags: postinstall nowait skipifsilent

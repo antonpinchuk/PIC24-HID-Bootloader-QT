@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->setWindowTitle(APPLICATION_VERSION);
+
     updateAvailableDialog = new UpdateAvailableDialog(this);
     UpdateScheduler       = new TUpdateScheduler(this);
     SystemTrayMenu        = new QMenu("tray menu");
