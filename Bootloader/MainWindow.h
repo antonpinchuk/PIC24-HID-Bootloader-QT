@@ -98,6 +98,9 @@ private slots:
     void onMessage(Bootloader::MessageType type, QString value);
     void onMessageClear();
 
+    void onChangedMemoryRanges(int value);
+
+
     void on_actionBlank_Check_triggered();
     void on_actionReset_Device_triggered();
     void on_action_Settings_triggered();
