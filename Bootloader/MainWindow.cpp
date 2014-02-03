@@ -172,10 +172,14 @@ void MainWindow::setConnected(bool connected)
         }
     } else {
         deviceLabel.setText("Disconnected");
+
+        ui->actionSaveMemoryRange->setEnabled(false);
+
         comboMemoryRanges.clear();
         comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(ALL_MEMORY_RANGES),QVariant(ALL_MEMORY_RANGES));
     }
     ui->action_Settings->setEnabled(connected);
+    ui->actionRead_Device->setEnabled(connected);
 
     // Was in original project, looks like because calling from constructor does not work
     UpdateRecentFileList();
@@ -263,6 +267,8 @@ void MainWindow::on_actionWrite_Device_triggered()
 void MainWindow::on_actionRead_Device_triggered()
 {
     future = QtConcurrent::run(bootloader, &Bootloader::ReadDevice);
+
+    ui->actionSaveMemoryRange->setEnabled(true);
 }
 
 void MainWindow::on_actionBlank_Check_triggered()
@@ -427,6 +433,8 @@ void MainWindow::LoadFile(QString newFileName)
         }
         settings.setValue("recentFileList", files);
         UpdateRecentFileList();
+
+        ui->actionSaveMemoryRange->setEnabled(true);
     }
 
     QApplication::restoreOverrideCursor();
