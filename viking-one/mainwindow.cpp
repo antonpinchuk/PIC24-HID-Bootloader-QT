@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#define MEMORY_RANGE_FIRMWARE 0
+#define MEMORY_RANGE_RUNEPACK 1
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -20,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(quitAction, SIGNAL(triggered()), this, SLOT(Exit()) );
     connect(checkUpdateAction, SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
-    connect(checkUploadFirmware, SIGNAL(triggered()), this, SLOT(UploadFirmware()) );
+    connect(checkUploadFirmware, SIGNAL(triggered()), this, SLOT(onUploadFirmware()) );
 
     Ico = new QSystemTrayIcon(this);
     Ico->setIcon(QIcon(":/new/ico/app.ico"));
@@ -86,39 +90,6 @@ void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
     }
 }
 
-void MainWindow::UploadFirmware()
-{
-    QString newFileName;
-    HexImporter::ErrorCode result;
-    onMessageClear();
-
-    newFileName = QFileDialog::getOpenFileName(this, "Open Hex File", fileName, "Hex Files (*.hex *.ehx)");
-    if (newFileName.isEmpty()) {
-        return;
-    }
-
-    QApplication::setOverrideCursor(Qt::BusyCursor);
-    result = bootloader->LoadFile(newFileName);
-    QApplication::restoreOverrideCursor();
-
-    if (result == HexImporter::Success) {
-        onMessage(Bootloader::Info, "Starting Erase/Program/Verify Sequence.");
-        onMessage(Bootloader::Info, "Do not unplug device or disconnect power until the operation is fully complete.");
-        onMessage(Bootloader::Info, " ");
-
-        future = QtConcurrent::run(bootloader, &Bootloader::WriteDevice);
-    }
-}
-
-void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
-{
-    updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
-}
-
-void MainWindow::Exit()
-{
-    QCoreApplication::exit();
-}
 
 void MainWindow::setConnected(bool connected)
 {
@@ -178,12 +149,34 @@ void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
 }
 
+
 void MainWindow::updateProgressBar(int newValue) {
     ui->progressBar->setValue(newValue);
 }
 
+void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
+{
+    updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
+}
+
+void MainWindow::Exit()
+{
+    QCoreApplication::exit();
+}
+
+void MainWindow::onUploadFirmware()
+{
+    uploadFirmware(MEMORY_RANGE_RUNEPACK);
+}
 
 void MainWindow::on_WriteRunePackBtn_clicked()
+{
+    uploadFirmware(MEMORY_RANGE_FIRMWARE);
+}
+
+
+
+void MainWindow::uploadFirmware(unsigned char range)
 {
     QString newFileName;
     HexImporter::ErrorCode result;
@@ -202,6 +195,8 @@ void MainWindow::on_WriteRunePackBtn_clicked()
         onMessage(Bootloader::Info, "Starting Erase/Program/Verify Sequence.");
         onMessage(Bootloader::Info, "Do not unplug device or disconnect power until the operation is fully complete.");
         onMessage(Bootloader::Info, " ");
+
+        //bootloader->rangeReadWrite = range;
 
         future = QtConcurrent::run(bootloader, &Bootloader::WriteDevice);
     }

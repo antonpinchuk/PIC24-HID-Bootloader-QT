@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-//------------------------------------------------------------------------------------------------------------//
+
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QIcon>
@@ -16,9 +16,9 @@
 #include "HIDBootloader/Bootloader.h"
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
-//------------------------------------------------------------------------------------------------------------//
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -30,27 +30,30 @@ public:
 private:
     Ui::MainWindow   *ui;
 
+    Bootloader  *bootloader;
+
+    QString fileName;
+
     QSystemTrayIcon  *Ico;
     TUpdateScheduler *UpdateScheduler;
 
     UpdateAvailableDialog *updateAvailableDialog;
 
     QMenu*   SystemTrayMenu;
-    QString       fileName;
     QFuture<void> future;
-
-    Bootloader  *bootloader;
 
     QAction* checkUpdateAction;
     QAction* checkUploadFirmware;
     QAction* quitAction;
 
+    void uploadFirmware(unsigned char range);
+
 protected:
-     void changeEvent( QEvent * event );
+     void changeEvent(QEvent* event);
 
 private slots:
     void TrayIcoClick(QSystemTrayIcon::ActivationReason Reason);
-    void UploadFirmware();
+    void onUploadFirmware();
     void NeedUpdate(QString AppFile, QString ReleaseNotes);    
     void Exit();
 
@@ -64,5 +67,5 @@ private slots:
 
     void on_WriteRunePackBtn_clicked();
 };
-//------------------------------------------------------------------------------------------------------------//
+
 #endif // MAINWINDOW_H
