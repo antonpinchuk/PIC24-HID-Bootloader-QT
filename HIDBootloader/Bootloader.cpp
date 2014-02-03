@@ -10,6 +10,7 @@
  */
 Bootloader::Bootloader() {    
     hexOpen = false;
+    rangeReadWrite = ALL_MEMORY_RANGES;
     deviceFirmwareIsAtLeast101 = false;
 
     comm = new Comm();
@@ -137,7 +138,7 @@ void Bootloader::GetQuery()
 
     //Send the Query command to the device over USB, and check the result status.
     result = comm->ReadBootloaderInfo(&bootInfo);
-    switch(result);
+    switch(result)
     {
         case Comm::Fail:
         case Comm::IncorrectCommand:

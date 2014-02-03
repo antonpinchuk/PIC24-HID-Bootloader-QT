@@ -60,11 +60,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->mainToolBar->addWidget(&labelMemoryRanges);
     ui->mainToolBar->addWidget(&comboMemoryRanges);
     comboMemoryRanges.addItem("All reanges",QVariant(0));
-    bootloader->rangeReadWrite = ALL_MEMORY_RANGES;
-
 
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
     qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
+
 
     bootloader = new Bootloader();
 

@@ -76,17 +76,17 @@ protected:
     Comm::ErrorCode RemapInterruptVectors(Device* device, DeviceData* deviceData);
 
 private:
-    bool pollUsbEnabled;
-   
-    QList<DeviceData::MemoryRange> _rangesReadWrite;
     DeviceData* hexData;
 
     bool deviceFirmwareIsAtLeast101;
 
+    bool pollUsbEnabled;
+   
     void log(QString value);
     void log(MessageType type, QString value);
     void logClear();
 
+    QList<DeviceData::MemoryRange> _rangesReadWrite;
     QList<DeviceData::MemoryRange> _getRangesReadWrite(QList<DeviceData::MemoryRange> allRanges);
 
 };
