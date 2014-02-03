@@ -966,6 +966,56 @@ HexImporter::ErrorCode Bootloader::LoadFile(QString newFileName)
     return result;
 }
 
+void Bootloader::SaveFile(QString fileName)
+{
+    QFile binFile(fileName);
+
+    if (!binFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        log("Can not open the file to write...");
+        return ;
+    }
+
+    QByteArray byteWriteArray;
+    DeviceData::MemoryRange deviceRange;
+
+    log("Write memory range to file...");
+
+    for (int k = 0; k < deviceData->ranges.size(); k++)
+    {
+        deviceRange = deviceData->ranges[k];
+
+        if (rangeReadWrite != ALL_MEMORY_RANGES && rangeReadWrite != k) {
+            continue; // Process single range only if selected
+        }
+
+        if(deviceRange.type == PROGRAM_MEMORY)
+        {
+            if (!writeFlash) {
+                continue;
+            }
+        }
+        else if(deviceRange.type == EEPROM_MEMORY)
+        {
+            if (!writeEeprom) {
+                continue;
+            }
+        }
+        else if(deviceRange.type == CONFIG_MEMORY)
+        {
+            if (!writeConfig) {
+                continue;
+            }
+        }
+
+        byteWriteArray.clear();
+        byteWriteArray.insert(0,(char *)deviceRange.pDataBuffer,deviceRange.dataBufferLength);
+        binFile.write(byteWriteArray);
+
+    }
+    log("Write file complete...");
+    binFile.close();
+}
+
 
 void Bootloader::IoWithDeviceStarted(QString msg) {
     //Causes error: QObject::killTimer: timers cannot be stopped from another thread

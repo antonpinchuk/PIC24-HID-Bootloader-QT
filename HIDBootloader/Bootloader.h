@@ -5,6 +5,8 @@
 #include <QTextStream>
 #include <QFileInfo>
 #include <QString>
+#include <QByteArray>
+
 
 #include "DeviceData.h"
 #include "Device.h"
@@ -58,6 +60,7 @@ public:
     void ReadDevice(void);
 
     HexImporter::ErrorCode LoadFile(QString fileName);
+    void SaveFile(QString fileName);
 
     QString GetMemoryRangeNameByType(int value);
 

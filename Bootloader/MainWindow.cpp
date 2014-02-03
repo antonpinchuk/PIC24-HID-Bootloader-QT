@@ -323,7 +323,7 @@ void MainWindow::on_actionSaveMemoryRange_triggered()
 
 
     newFileName =
-        QFileDialog::getOpenFileName(this, "Save Binary File", "MemoryRange_" + newFileSave, "Binary Files (*." + newFileExt + ")");
+        QFileDialog::getSaveFileName(this, "Save Binary File", "MemoryRange_" + newFileSave, "Binary Files (*." + newFileExt + ")");
     if(newFileName.isEmpty())
     {
         return;
@@ -505,7 +505,11 @@ void MainWindow::LoadFile(QString newFileName)
 
 void MainWindow::SaveFile(QString fileName)
 {
+    QApplication::setOverrideCursor(Qt::BusyCursor);
 
+    bootloader->SaveFile(fileName);
+
+    QApplication::restoreOverrideCursor();
 }
 
 
