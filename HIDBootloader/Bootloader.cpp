@@ -29,6 +29,8 @@ Bootloader::Bootloader() {
     //timer->moveToThread(this); // why does not work?
 
     connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
+
+    //_rangesReadWrite = new QList<DeviceData::MemoryRange>();
 }
 
 /**
@@ -43,6 +45,8 @@ Bootloader::~Bootloader() {
     delete device;
 
     delete timer;
+
+    //delete _rangesReadWrite;
 }
 
 
@@ -300,13 +304,14 @@ void Bootloader::VerifyDevice()
     unsigned char flashData[MAX_ERASE_BLOCK_SIZE];
     unsigned char hexEraseBlockData[MAX_ERASE_BLOCK_SIZE];
     unsigned long int startOfEraseBlock;
+    QList<DeviceData::MemoryRange> deviceDataRanges = _getRangesReadWrite(deviceData->ranges);
 
     //Initialize an erase block sized buffer with 0xFF.
     //Used later for post SIGN_FLASH verify operation.
     memset(&hexEraseBlockData[0], 0xFF, MAX_ERASE_BLOCK_SIZE);
 
     IoWithDeviceStarted("Verifying Device...");
-    foreach(deviceRange, deviceData->ranges)
+    foreach(deviceRange, deviceDataRanges)
     {
         if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
         {
@@ -633,6 +638,7 @@ void Bootloader::WriteDevice(void)
     QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange hexRange;
+    QList<DeviceData::MemoryRange> hexDataRanges = _getRangesReadWrite(hexData->ranges);
 
     //Update the progress bar so the user knows things are happening.
     emit setProgressBar(3);
@@ -643,7 +649,7 @@ void Bootloader::WriteDevice(void)
     //we parsed the user's .hex file.
 
     IoWithDeviceStarted("Writing Device...");
-    foreach(hexRange, hexData->ranges)
+    foreach(hexRange, hexDataRanges)
     {
         if(writeFlash && (hexRange.type == PROGRAM_MEMORY))
         {
@@ -709,10 +715,11 @@ void Bootloader::BlankCheckDevice(void)
     QTime elapsed;
     Comm::ErrorCode result;
     DeviceData::MemoryRange deviceRange;
+    QList<DeviceData::MemoryRange> deviceDataRanges = _getRangesReadWrite(deviceData->ranges);
 
     elapsed.start();
 
-    foreach(deviceRange, deviceData->ranges)
+    foreach(deviceRange, deviceDataRanges)
     {
         if(writeFlash && (deviceRange.type == PROGRAM_MEMORY))
         {
@@ -947,4 +954,19 @@ void Bootloader::logClear()
 
 void Bootloader::commProgressBar(int newValue) {
     emit setProgressBar(newValue);
+}
+
+QList<DeviceData::MemoryRange> Bootloader::_getRangesReadWrite(QList<DeviceData::MemoryRange> allRanges)
+{
+    DeviceData::MemoryRange range;
+
+    if (rangeReadWrite == ALL_MEMORY_RANGES) {
+        return allRanges;
+    }
+    foreach (range, allRanges) {
+        if (range.type == rangeReadWrite) {
+            _rangesReadWrite.append(range);
+        }
+    }
+    return _rangesReadWrite;
 }

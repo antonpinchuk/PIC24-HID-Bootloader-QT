@@ -39,6 +39,8 @@ public:
 
     bool wasBootloaderMode;
     bool eraseDuringWrite;
+    //unsigned char rangeReadWrite = ALL_MEMORY_RANGES;
+    unsigned char rangeReadWrite = PROGRAM_MEMORY;
 
     void GetQuery(void);
     void EraseDevice(void);
@@ -68,6 +70,8 @@ protected:
 private:
     bool pollUsbEnabled;
 
+    QList<DeviceData::MemoryRange> _rangesReadWrite;
+
     DeviceData* deviceData;
     DeviceData* hexData;
 
@@ -76,6 +80,8 @@ private:
     void log(QString value);
     void log(MessageType type, QString value);
     void logClear();
+
+    QList<DeviceData::MemoryRange> _getRangesReadWrite(QList<DeviceData::MemoryRange> allRanges);
 
 };
 
