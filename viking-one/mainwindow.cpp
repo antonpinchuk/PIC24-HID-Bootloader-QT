@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->CheckVersionBtn->setVisible(false); // test check version button
+
     QString VersionStr(APPLICATION_VERSION);
     this->setWindowTitle("XBOX One Berserker Modded Controller Software - Version " + VersionStr);
 
