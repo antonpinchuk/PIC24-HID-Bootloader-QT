@@ -61,6 +61,7 @@ void Bootloader::Connection(void) {
         if (comm->isConnected()) {
             qWarning("Attempting to open device...");
             comm->open();
+            logClear();
             log("Device Attached.");
             log("Connecting...");
             if(writeConfig) {
@@ -77,6 +78,7 @@ void Bootloader::Connection(void) {
         } else {
             qWarning("Closing device.");
             comm->close();
+            logClear();
             log("Device Detached.");
             hexOpen = false;
             emit setConnected(false);
