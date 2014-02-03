@@ -22,7 +22,7 @@ Source: "D:\Work\Viking\setup\bin\platforms\qwindows.dll"; DestDir: "{app}\platf
 
 [Setup]
 AppName=Berserker Modded Controller Software
-AppVersion=0.0.2.1402031300
+AppVersion=0.0.2.1402031340
 DefaultDirName={pf}\viking-one\
 OutputBaseFilename=viking-one-setup
 AllowRootDirectory=True

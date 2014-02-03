@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setWindowTitle(APPLICATION_VERSION);
+    QString VersionStr(APPLICATION_VERSION);
+    this->setWindowTitle("XBOX One Berserker Modded Controller Software - Version " + VersionStr);
 
     updateAvailableDialog = new UpdateAvailableDialog(this);
     UpdateScheduler       = new TUpdateScheduler(this);

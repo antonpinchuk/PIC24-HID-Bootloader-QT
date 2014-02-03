@@ -8,6 +8,8 @@ UpdateAvailableDialog::UpdateAvailableDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->UpdateNowBtn, SIGNAL(clicked()), this, SLOT(StartDownloader()));
+
+    // this->setWindowFlags( Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint  );
 }
 //------------------------------------------------------------------------------------------------------------//
 UpdateAvailableDialog::~UpdateAvailableDialog()

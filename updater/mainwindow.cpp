@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setWindowTitle(APPLICATION_VERSION);
+    QString VersionStr(APPLICATION_VERSION);
+    this->setWindowTitle("Viking update downloader - Version " + VersionStr);
 
     WebCtrl = new QNetworkAccessManager(this);
 
@@ -67,8 +68,8 @@ void MainWindow::FileDownloaded(QNetworkReply* Reply)
     File.close();
 
     QStringList Arguments;
-    Arguments << "VERYSILENT";
-    Arguments << "CLOSEAPPLICATIONS";
+    Arguments << "/VERYSILENT";
+    Arguments << "/CLOSEAPPLICATIONS";
 
     QProcess::startDetached(QUserUpdatesDir + FileName, Arguments);
 
