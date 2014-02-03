@@ -31,6 +31,8 @@
 #define EEPROM_MEMORY       0x02
 #define CONFIG_MEMORY       0x03
 #define USERID_MEMORY       0x04
+#define EEPROM_RUNE_MEMORY          0x65
+#define EEPROM_USER_PROGRAM_MEMORY  0x66
 #define END_OF_TYPES_LIST   0xFF
 #define BOOTLOADER_V1_01_OR_NEWER_FLAG   0xA5   //Tacked on in region Type6 byte, to indicate when using newer version of bootloader with extended query info available
 
