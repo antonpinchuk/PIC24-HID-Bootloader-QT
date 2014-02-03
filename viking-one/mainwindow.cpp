@@ -56,8 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
-    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplite()));
-    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplite()));
+    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplete()));
+    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplete()));
 
     setConnected(false);
     setBootloadEnabled(false);
@@ -155,12 +155,12 @@ void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
 }
 
-void MainWindow::onReadComplite()
+void MainWindow::onReadComplete()
 {
 
 }
 
-void MainWindow::onWriteComplite()
+void MainWindow::onWriteComplete()
 {
 
 }

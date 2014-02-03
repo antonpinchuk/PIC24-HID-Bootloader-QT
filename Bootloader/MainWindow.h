@@ -89,6 +89,7 @@ private:
     bool wasBootloaderMode;
 
     void LoadFile(QString fileName);
+    void SaveFile(QString fileName);
 
     QLabel labelMemoryRanges;
     QComboBox comboMemoryRanges;
@@ -101,8 +102,8 @@ private slots:
     void onMessage(Bootloader::MessageType type, QString value);
     void onMessageClear();
 
-    void onReadComplite();
-    void onWriteComplite();
+    void onReadComplete();
+    void onWriteComplete();
 
     void onChangedMemoryRanges(int value);
 

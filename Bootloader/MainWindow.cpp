@@ -76,8 +76,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
-    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplite()));
-    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplite()));
+    connect(bootloader, SIGNAL(ReadComplete()), this, SLOT(onReadComplete()));
+    connect(bootloader, SIGNAL(WriteComplete()), this, SLOT(onWriteComplete()));
 
     fileWatcher = NULL;
 
@@ -239,12 +239,12 @@ void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
 }
 
-void MainWindow::onReadComplite()
+void MainWindow::onReadComplete()
 {
-
+    ui->actionSaveMemoryRange->setEnabled(true);
 }
 
-void MainWindow::onWriteComplite()
+void MainWindow::onWriteComplete()
 {
 
 }
@@ -274,8 +274,6 @@ void MainWindow::on_actionWrite_Device_triggered()
 void MainWindow::on_actionRead_Device_triggered()
 {
     future = QtConcurrent::run(bootloader, &Bootloader::ReadDevice);
-
-    ui->actionSaveMemoryRange->setEnabled(true);
 }
 
 void MainWindow::on_actionBlank_Check_triggered()
@@ -291,8 +289,7 @@ void MainWindow::on_actionErase_Device_triggered()
 //Executes when the user clicks the open hex file button on the main form.
 void MainWindow::on_actionOpen_triggered()
 {
-    QString msg, newFileName;
-    QTextStream stream(&msg);
+    QString newFileName;
 
     //Create an open file dialog box, so the user can select a .hex file.
     newFileName =
@@ -309,7 +306,26 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionSaveMemoryRange_triggered()
 {
+    QString newFileName, newFileExt, newFileSave;
 
+    if (bootloader->rangeReadWrite == ALL_MEMORY_RANGES) {
+        newFileExt = "bin";
+        newFileSave = "All";
+    } else {
+        int memryRangeType = bootloader->deviceData->ranges[bootloader->rangeReadWrite].type;
+        newFileExt = bootloader->GetMemoryRangeNameByType(memryRangeType);
+        newFileSave = newFileExt;
+    }
+
+
+    newFileName =
+        QFileDialog::getOpenFileName(this, "Save Binary File", "MemoryRange_" + newFileSave, "Binary Files (*." + newFileExt + ")");
+    if(newFileName.isEmpty())
+    {
+        return;
+    }
+
+    SaveFile(newFileName);
 }
 
 void MainWindow::on_action_Settings_triggered()
@@ -415,38 +431,6 @@ void MainWindow::on_actionReset_Device_triggered()
     bootloader->comm->Reset();
 }
 
-
-void MainWindow::LoadFile(QString newFileName)
-{
-    HexImporter::ErrorCode result;
-
-    QApplication::setOverrideCursor(Qt::BusyCursor);
-
-    result = bootloader->LoadFile(newFileName);
-
-    if (result == HexImporter::Success) {
-        fileName = newFileName;
-        watchFileName = newFileName;
-
-        QSettings settings;
-        settings.beginGroup("MainWindow");
-
-        QStringList files = settings.value("recentFileList").toStringList();
-        files.removeAll(fileName);
-        files.prepend(fileName);
-        while(files.size() > MAX_RECENT_FILES)
-        {
-            files.removeLast();
-        }
-        settings.setValue("recentFileList", files);
-        UpdateRecentFileList();
-
-        ui->actionSaveMemoryRange->setEnabled(true);
-    }
-
-    QApplication::restoreOverrideCursor();
-}
-
 void MainWindow::openRecentFile(void)
 {
     QAction *action = qobject_cast<QAction *>(sender());
@@ -481,6 +465,42 @@ void MainWindow::UpdateRecentFileList(void)
     {
         recentFiles[i]->setVisible(false);
     }
+}
+
+void MainWindow::LoadFile(QString newFileName)
+{
+    HexImporter::ErrorCode result;
+
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+
+    result = bootloader->LoadFile(newFileName);
+
+    if (result == HexImporter::Success) {
+        fileName = newFileName;
+        watchFileName = newFileName;
+
+        QSettings settings;
+        settings.beginGroup("MainWindow");
+
+        QStringList files = settings.value("recentFileList").toStringList();
+        files.removeAll(fileName);
+        files.prepend(fileName);
+        while(files.size() > MAX_RECENT_FILES)
+        {
+            files.removeLast();
+        }
+        settings.setValue("recentFileList", files);
+        UpdateRecentFileList();
+
+        ui->actionSaveMemoryRange->setEnabled(true);
+    }
+
+    QApplication::restoreOverrideCursor();
+}
+
+void MainWindow::SaveFile(QString fileName)
+{
+
 }
 
 
