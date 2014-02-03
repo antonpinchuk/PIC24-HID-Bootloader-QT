@@ -45,8 +45,7 @@ public:
 
     bool wasBootloaderMode;
     bool eraseDuringWrite;
-    //unsigned char rangeReadWrite = ALL_MEMORY_RANGES;
-    unsigned char rangeReadWrite = PROGRAM_MEMORY;
+    unsigned char rangeReadWrite = ALL_MEMORY_RANGES;
 
     void GetQuery(void);
     void EraseDevice(void);

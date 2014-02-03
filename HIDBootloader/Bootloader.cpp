@@ -27,7 +27,7 @@ Bootloader::Bootloader() {
 
     connect(comm, SIGNAL(SetProgressBar(int)), this, SLOT(commProgressBar(int)));
 
-    //_rangesReadWrite = new QList<DeviceData::MemoryRange>();
+    _rangesReadWrite.append(null);
 }
 
 /**
@@ -985,15 +985,10 @@ void Bootloader::commProgressBar(int newValue) {
 
 QList<DeviceData::MemoryRange> Bootloader::_getRangesReadWrite(QList<DeviceData::MemoryRange> allRanges)
 {
-    DeviceData::MemoryRange range;
-
     if (rangeReadWrite == ALL_MEMORY_RANGES) {
         return allRanges;
     }
-    foreach (range, allRanges) {
-        if (range.type == rangeReadWrite) {
-            _rangesReadWrite.append(range);
-        }
-    }
-    return _rangesReadWrite;
+    _rangesReadWrite[0] = allRanges[rangeReadWrite];
+
+    return _rangesReadWrite; // return list with single selected range
 }
