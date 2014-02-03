@@ -62,7 +62,6 @@ private slots:
     void onMessage(Bootloader::MessageType type, QString value);
     void onMessageClear();
 
-    void enabledBtn(bool enable);
     void on_WriteRunePackBtn_clicked();
 };
 //------------------------------------------------------------------------------------------------------------//
