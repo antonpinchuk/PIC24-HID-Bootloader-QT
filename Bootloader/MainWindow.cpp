@@ -102,27 +102,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     bootloader->eraseDuringWrite = true;
     settings.endGroup();
 
-    //    //Make initial check to see if the USB device is attached
-    //    bootloader->comm->PollUSB();
-    //    if(bootloader->comm->isConnected())
-    //    {
-    //        qWarning("Attempting to open device...");
-    //        bootloader->comm->open();
-    //        ui->plainTextEdit->setPlainText("Device Attached.");
-    //        ui->plainTextEdit->appendPlainText("Connecting...");
-    //        bootloader->GetQuery();
-    //    }
-    //    else
-    //    {
-    //        ui->plainTextEdit->appendPlainText("Device not detected.  Verify device is attached and in firmware update mode.");
-    //        deviceLabel.setText("Disconnected");
-    //        bootloader->hexOpen = false;
-    //        setBootloadEnabled(false);
-    //        emit SetProgressBar(0);
-    //    }
-    // Disconnected by default, if device attached bootloader will update UI in 1 sec
-    setConnected(false);
-    setBootloadEnabled(false);
+    //Make initial check to see if the USB device is attached
+    bootloader->comm->PollUSB();
+    if (bootloader->comm->isConnected()) {
+        qWarning("Attempting to open device...");
+        bootloader->comm->open();
+        onMessage(Bootloader::Info, "Device Attached.");
+        onMessage(Bootloader::Info, "Connecting...");
+        bootloader->GetQuery();
+    } else {
+        onMessage(Bootloader::Info, "Device not detected.  Verify device is attached and in firmware update mode.");
+        setConnected(false);
+        setBootloadEnabled(false);
+        updateProgressBar(0);
+    }
 
     //Update the file list in the File-->[import files list] area, so the user can quickly re-load a previously used .hex file.
     //UpdateRecentFileList(); // moved to setConnected()
