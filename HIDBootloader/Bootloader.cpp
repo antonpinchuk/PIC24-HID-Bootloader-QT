@@ -1,9 +1,5 @@
 #include "Bootloader.h"
 
-#include <QTime>
-#include <QTextStream>
-#include <QFileInfo>
-
 //Surely the micro doesn't have a programmable memory region greater than 268 Megabytes...
 //Value used for error checking device reponse values.
 #define MAXIMUM_PROGRAMMABLE_MEMORY_SEGMENT_SIZE 0x0FFFFFFF
@@ -47,6 +43,32 @@ Bootloader::~Bootloader() {
     delete timer;
 
     //delete _rangesReadWrite;
+}
+
+QString Bootloader::GetMemoryRangeNameByType(int value){
+    switch(value){
+        case ALL_MEMORY_RANGES:
+                return "All ranges";
+            break;
+        case PROGRAM_MEMORY:
+                return "Program memory";
+            break;
+        case EEPROM_MEMORY:
+                return "EEPROM";
+            break;
+        case EEPROM_RUNE_MEMORY:
+                return "EEPROM rune data";
+            break;
+        case EEPROM_USER_PROGRAM_MEMORY:
+                return "EEPROM user program data";
+            break;
+        case CONFIG_MEMORY:
+                return "Config bits";
+            break;
+
+
+    }
+    return NULL;
 }
 
 
@@ -101,6 +123,7 @@ void Bootloader::GetQuery()
     QString connectMsg;
     QTextStream ss(&connectMsg);
 
+    Comm::ErrorCode result;
 
     qDebug("Executing GetQuery() command.");
 
@@ -113,7 +136,8 @@ void Bootloader::GetQuery()
     }
 
     //Send the Query command to the device over USB, and check the result status.
-    switch(comm->ReadBootloaderInfo(&bootInfo))
+    result = comm->ReadBootloaderInfo(&bootInfo);
+    switch(result);
     {
         case Comm::Fail:
         case Comm::IncorrectCommand:
@@ -124,8 +148,7 @@ void Bootloader::GetQuery()
             break;
         case Comm::Success:
             wasBootloaderMode = true;
-            ss << "Device Ready";
-            emit setConnected(true);
+            ss << "Device Ready";           
             break;
         default:
             return;
@@ -254,13 +277,16 @@ void Bootloader::GetQuery()
 
 
     //Make sure user has allowed at least one region to be programmed
-    if(!(writeFlash || writeEeprom || writeConfig))
-    {
+    if (!(writeFlash || writeEeprom || writeConfig)) {
         emit setBootloadEnabled(false);
         //ui->action_Settings->setEnabled(true);
-    }
-    else
+    } else {
         emit setBootloadEnabled(true);
+    }
+
+    if (result == Comm::Success) {
+        emit setConnected(true);
+    }
 }
 
 
