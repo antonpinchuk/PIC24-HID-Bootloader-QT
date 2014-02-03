@@ -74,7 +74,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
-
+    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplite()));
+    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplite()));
 
     fileWatcher = NULL;
 
@@ -242,6 +243,17 @@ void MainWindow::onMessage(Bootloader::MessageType type, QString value) {
 void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
 }
+
+void MainWindow::onReadComplite()
+{
+
+}
+
+void MainWindow::onWriteComplite()
+{
+
+}
+
 
 
 void MainWindow::on_actionExit_triggered() {

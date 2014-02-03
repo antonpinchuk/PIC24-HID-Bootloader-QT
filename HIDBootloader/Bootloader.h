@@ -31,6 +31,9 @@ signals:
     void setProgressBar(int newValue);
     void message(Bootloader::MessageType type, QString value);
     void messageClear();
+    void ReadComplite();
+    void WriteComplite();
+
 
 public:    
     Comm* comm;

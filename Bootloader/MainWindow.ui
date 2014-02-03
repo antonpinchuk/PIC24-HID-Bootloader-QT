@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>403</height>
+    <width>455</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>455</width>
+    <height>410</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string notr="true">USB HID Bootloader</string>
@@ -62,7 +68,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>439</width>
+     <width>455</width>
      <height>21</height>
     </rect>
    </property>

@@ -341,6 +341,8 @@ void Bootloader::ReadDevice()
         IoWithDeviceCompleted("Reading", result, ((double)elapsed.elapsed()) / 1000);
     }
     log("Reading Complete.");
+
+    emit ReadComplite();
 }
 
 //Routine that verifies the contents of the non-voltaile memory regions in the device, after an erase/programming cycle.
@@ -770,6 +772,8 @@ void Bootloader::WriteDevice(void)
     IoWithDeviceCompleted("Write", result, ((double)elapsed.elapsed()) / 1000);
 
     VerifyDevice();
+
+    emit WriteComplite();
 }
 
 
