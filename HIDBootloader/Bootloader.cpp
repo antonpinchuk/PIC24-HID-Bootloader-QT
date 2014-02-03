@@ -286,6 +286,62 @@ void Bootloader::EraseDevice(void)
     }
 }
 
+void Bootloader::ReadDevice()
+{
+    Comm::ErrorCode result;
+    DeviceData::MemoryRange deviceRange;
+    unsigned int bytesPerWord;
+    unsigned int bytesPerAddress;
+    QTime elapsed;
+
+    log("Reading Device...");
+    for (int k = 0; k < deviceData->ranges.size(); k++)
+    {
+        deviceRange = deviceData->ranges[k];
+
+        if (rangeReadWrite != ALL_MEMORY_RANGES && rangeReadWrite != k) {
+            continue; // Process single range only if selected
+        }
+
+        if(deviceRange.type == PROGRAM_MEMORY)
+        {
+            if (!writeFlash) {
+                continue;
+            }
+            bytesPerAddress = device->bytesPerAddressFLASH;
+            bytesPerWord = device->bytesPerWordFLASH;
+        }
+        else if(deviceRange.type == EEPROM_MEMORY)
+        {
+            if (!writeEeprom) {
+                continue;
+            }
+            bytesPerAddress = device->bytesPerAddressEEPROM;
+            bytesPerWord = device->bytesPerWordEEPROM;
+        }
+        else if(deviceRange.type == CONFIG_MEMORY)
+        {
+            if (!writeConfig) {
+                continue;
+            }
+            bytesPerAddress = device->bytesPerAddressConfig;
+            bytesPerWord = device->bytesPerWordConfig;
+        }
+
+        elapsed.start();
+        IoWithDeviceStarted("Read " + GetMemoryRangeNameByType(deviceRange.type) + " Memory...");
+
+        result = comm->GetData(deviceRange.start,
+                               device->bytesPerPacket,
+                               bytesPerAddress,
+                               bytesPerWord,
+                               deviceRange.end,
+                               deviceRange.pDataBuffer);
+
+        IoWithDeviceCompleted("Reading", result, ((double)elapsed.elapsed()) / 1000);
+    }
+    log("Reading Complete.");
+}
 
 //Routine that verifies the contents of the non-voltaile memory regions in the device, after an erase/programming cycle.
 //This function requests the memory contents of the device, then compares it against the parsed .hex file data to make sure

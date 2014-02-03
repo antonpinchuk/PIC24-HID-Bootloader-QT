@@ -260,6 +260,11 @@ void MainWindow::on_actionWrite_Device_triggered()
     onMessage(Bootloader::Info, " ");
 }
 
+void MainWindow::on_actionRead_Device_triggered()
+{
+    future = QtConcurrent::run(bootloader, &Bootloader::ReadDevice);
+}
+
 void MainWindow::on_actionBlank_Check_triggered()
 {
     future = QtConcurrent::run(bootloader, &Bootloader::BlankCheckDevice);
@@ -286,6 +291,12 @@ void MainWindow::on_actionOpen_triggered()
     }
 
     LoadFile(newFileName);
+}
+
+
+void MainWindow::on_actionSaveMemoryRange_triggered()
+{
+
 }
 
 void MainWindow::on_action_Settings_triggered()
@@ -458,12 +469,3 @@ void MainWindow::UpdateRecentFileList(void)
 }
 
 
-void MainWindow::on_actionSaveMemoryRange_triggered()
-{
-
-}
-
-void MainWindow::on_actionRead_Device_triggered()
-{
-
-}
