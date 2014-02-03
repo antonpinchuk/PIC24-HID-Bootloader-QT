@@ -11,5 +11,6 @@
         <file>img/help.png</file>
         <file>img/Microchip_logo.Ico</file>
         <file>img/SAVE.BMP</file>
+        <file>img/readtqfp.png</file>
     </qresource>
 </RCC>

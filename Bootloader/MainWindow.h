@@ -77,7 +77,7 @@ protected:
     QString fileName, watchFileName;
     QFileSystemWatcher* fileWatcher;
 
-    void UpdateRecentFileList(void);
+    void UpdateRecentFileList(bool enabled = true);
 
 private:
     Ui::MainWindowClass *ui;

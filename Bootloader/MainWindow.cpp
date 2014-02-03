@@ -191,6 +191,7 @@ void MainWindow::setBootloadEnabled(bool enable)
     ui->actionOpen->setEnabled(enable);
     ui->actionBlank_Check->setEnabled(enable && !bootloader->writeConfig);
     ui->actionReset_Device->setEnabled(enable);
+    ui->action_Verify_Device->setEnabled(enable);
 
     comboMemoryRanges.setEnabled(enable);
 }
@@ -215,8 +216,11 @@ void MainWindow::setBootloadBusy(bool busy)
     ui->action_Settings->setEnabled(!busy);
     ui->actionBlank_Check->setEnabled(!busy && !bootloader->writeConfig);
     ui->actionReset_Device->setEnabled(!busy);
+    ui->action_Verify_Device->setEnabled(!busy);
+    ui->actionRead_Device->setEnabled(!busy);
 
     comboMemoryRanges.setEnabled(!busy);
+    UpdateRecentFileList(!busy);
 }
 
 void MainWindow::updateProgressBar(int newValue) {
@@ -440,7 +444,7 @@ void MainWindow::openRecentFile(void)
     }
 }
 
-void MainWindow::UpdateRecentFileList(void)
+void MainWindow::UpdateRecentFileList(bool enabled)
 {
     QSettings settings;
     settings.beginGroup("MainWindow");
@@ -459,6 +463,7 @@ void MainWindow::UpdateRecentFileList(void)
         recentFiles[i]->setText(text);
         recentFiles[i]->setData(files[i]);
         recentFiles[i]->setVisible(bootloader->comm->isConnected());
+        recentFiles[i]->setEnabled(enabled);
     }
 
     for(; i < MAX_RECENT_FILES; i++)

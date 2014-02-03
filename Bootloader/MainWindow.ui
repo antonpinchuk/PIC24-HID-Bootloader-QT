@@ -69,7 +69,7 @@
      <x>0</x>
      <y>0</y>
      <width>520</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -125,10 +125,10 @@
    <addaction name="actionSaveMemoryRange"/>
    <addaction name="separator"/>
    <addaction name="actionWrite_Device"/>
+   <addaction name="actionRead_Device"/>
    <addaction name="action_Verify_Device"/>
    <addaction name="actionErase_Device"/>
    <addaction name="actionBlank_Check"/>
-   <addaction name="actionRead_Device"/>
    <addaction name="actionReset_Device"/>
    <addaction name="separator"/>
   </widget>
@@ -206,7 +206,7 @@
     <string>&amp;Verify Device</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="action_Settings">
@@ -268,7 +268,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/MainWindow/img/verify.png</normaloff>:/MainWindow/img/verify.png</iconset>
+     <normaloff>:/MainWindow/img/readtqfp.png</normaloff>:/MainWindow/img/readtqfp.png</iconset>
    </property>
    <property name="text">
     <string>ReadDevice</string>
