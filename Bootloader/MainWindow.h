@@ -33,6 +33,7 @@
 #include <QFileSystemWatcher>
 #include <QtCore/QProcess>
 #include <QtWidgets/QMenu>
+#include <QComboBox>
 #include <QFuture>
 
 #include "HIDBootloader/Bootloader.h"
@@ -85,6 +86,9 @@ private:
     bool wasBootloaderMode;
 
     void LoadFile(QString fileName);
+
+    QLabel labelMemoryRanges;
+    QComboBox comboMemoryRanges;
 
 private slots:
     void setConnected(bool enable);

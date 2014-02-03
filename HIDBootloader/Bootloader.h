@@ -1,6 +1,11 @@
 #ifndef BOOTLOADER_H
 #define BOOTLOADER_H
 
+#include <QTime>
+#include <QTextStream>
+#include <QFileInfo>
+#include <QString>
+
 #include "DeviceData.h"
 #include "Device.h"
 #include "ImportExportHex.h"
@@ -30,6 +35,7 @@ signals:
 public:    
     Comm* comm;
     Device* device;
+    DeviceData* deviceData;
 
     bool hexOpen;
 
@@ -47,6 +53,8 @@ public:
     void VerifyDevice(void);
 
     HexImporter::ErrorCode LoadFile(QString fileName);
+
+    QString GetMemoryRangeNameByType(int value);
 
     explicit Bootloader();
     ~Bootloader();
@@ -68,7 +76,6 @@ protected:
 private:
     bool pollUsbEnabled;
 
-    DeviceData* deviceData;
     DeviceData* hexData;
 
     bool deviceFirmwareIsAtLeast101;

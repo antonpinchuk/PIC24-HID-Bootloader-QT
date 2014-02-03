@@ -55,6 +55,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setWindowTitle(APPLICATION + QString(" v") + VERSION);
     this->statusBar()->addPermanentWidget(&deviceLabel);
 
+    labelMemoryRanges.setText("Memory Range: ");
+    comboMemoryRanges.setMinimumWidth(100);
+    ui->mainToolBar->addWidget(&labelMemoryRanges);
+    ui->mainToolBar->addWidget(&comboMemoryRanges);
+    comboMemoryRanges.addItem("All reanges",QVariant(0));
+    bootloader->rangeReadWrite = ALL_MEMORY_RANGES;
+
+
     qRegisterMetaType<Comm::ErrorCode>("Comm::ErrorCode");
     qRegisterMetaType<Bootloader::MessageType>("Bootloader::MessageType");
 
@@ -146,8 +154,16 @@ void MainWindow::setConnected(bool connected)
 {
     if (connected) {
         deviceLabel.setText("Connected");
+        comboMemoryRanges.clear();
+        comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(ALL_MEMORY_RANGES),QVariant(ALL_MEMORY_RANGES));
+        for(int i = 0;i < bootloader->deviceData->ranges.size() ;i++){
+           comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(bootloader->deviceData->ranges[i].type),
+                                     QVariant(bootloader->deviceData->ranges[i].type));
+        }
     } else {
         deviceLabel.setText("Disconnected");
+        comboMemoryRanges.clear();
+        comboMemoryRanges.addItem(bootloader->GetMemoryRangeNameByType(ALL_MEMORY_RANGES),QVariant(ALL_MEMORY_RANGES));
     }
     ui->action_Settings->setEnabled(connected);
 
@@ -165,6 +181,8 @@ void MainWindow::setBootloadEnabled(bool enable)
     ui->actionOpen->setEnabled(enable);
     ui->actionBlank_Check->setEnabled(enable && !bootloader->writeConfig);
     ui->actionReset_Device->setEnabled(enable);
+
+    comboMemoryRanges.setEnabled(enable);
 }
 
 void MainWindow::setBootloadBusy(bool busy)
@@ -187,6 +205,8 @@ void MainWindow::setBootloadBusy(bool busy)
     ui->action_Settings->setEnabled(!busy);
     ui->actionBlank_Check->setEnabled(!busy && !bootloader->writeConfig);
     ui->actionReset_Device->setEnabled(!busy);
+
+    comboMemoryRanges.setEnabled(!busy);
 }
 
 void MainWindow::updateProgressBar(int newValue) {
