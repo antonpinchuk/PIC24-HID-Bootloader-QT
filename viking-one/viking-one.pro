@@ -9,7 +9,7 @@ QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-VERSION = 0.0.2.1402031340
+VERSION = 0.0.2.1402031630
 TARGET = viking-one
 TEMPLATE = app
 
