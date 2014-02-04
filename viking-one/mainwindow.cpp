@@ -17,19 +17,23 @@ MainWindow::MainWindow(QWidget *parent) :
     QString VersionStr(APPLICATION_VERSION);
     this->setWindowTitle("XBOX One Berserker Modded Controller Software - Version " + VersionStr);
 
-    updateAvailableDialog = new UpdateAvailableDialog(this);
+    updateAvailableDialog = new UpdateAvailableDialog(this); // 'this' non need?
+    aboutAppDialog        = new AboutAppDialog(this);
+
     UpdateScheduler       = new TUpdateScheduler(this);
     SystemTrayMenu        = new QMenu("tray menu");
 
-    ShowHideAction       = SystemTrayMenu->addAction("Read/write rune pack");
+    ShowHideAction       = SystemTrayMenu->addAction("Hide window");
     checkUpdateAction    = SystemTrayMenu->addAction("Check for updates");
     checkUploadFirmware  = SystemTrayMenu->addAction("Upload firmware");
     aboutVikingOneAction = SystemTrayMenu->addAction("About VikingOne");
     quitAction           = SystemTrayMenu->addAction("Exit");
 
-    connect(quitAction, SIGNAL(triggered()), this, SLOT(Exit()) );
-    connect(checkUpdateAction, SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
-    connect(checkUploadFirmware, SIGNAL(triggered()), this, SLOT(onUploadFirmware()) );
+    connect(ShowHideAction      , SIGNAL(triggered()), this           , SLOT(ShowOrHideForm()) );
+    connect(checkUpdateAction   , SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
+    connect(checkUploadFirmware , SIGNAL(triggered()), this           , SLOT(onUploadFirmware()) );
+    connect(aboutVikingOneAction, SIGNAL(triggered()), this           , SLOT(ShowAboutVikingOneWindow()) );
+    connect(quitAction          , SIGNAL(triggered()), this           , SLOT(Exit()) );
 
     Ico = new QSystemTrayIcon(this);
     Ico->setIcon(QIcon(":/new/ico/app.ico"));
@@ -86,13 +90,7 @@ void MainWindow::changeEvent(QEvent* event)
 void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
 {
     if(Reason == QSystemTrayIcon::Trigger){
-        if(!this->isHidden()){
-            this->hide();
-        }
-        else{
-            this->showNormal();
-            this->activateWindow();
-        }
+        ShowOrHideForm();
     }
 }
 
@@ -173,6 +171,24 @@ void MainWindow::updateProgressBar(int newValue) {
 void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
 {
     updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
+}
+
+void MainWindow::ShowOrHideForm()
+{
+    if(!this->isHidden()){
+        this->hide();
+        ShowHideAction->setText("Show window");
+        return;
+    }
+
+    ShowHideAction->setText("Hide window");
+    this->showNormal();
+    this->activateWindow();
+}
+
+void MainWindow::ShowAboutVikingOneWindow()
+{
+
 }
 
 void MainWindow::Exit()

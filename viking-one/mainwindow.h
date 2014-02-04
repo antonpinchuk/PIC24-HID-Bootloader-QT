@@ -13,6 +13,7 @@
 
 #include "updatescheduler.h"
 #include "updateavailabledialog.h"
+#include "aboutappdialog.h"
 #include "HIDBootloader/Bootloader.h"
 
 namespace Ui {
@@ -38,6 +39,7 @@ private:
     TUpdateScheduler *UpdateScheduler;
 
     UpdateAvailableDialog *updateAvailableDialog;
+    AboutAppDialog        *aboutAppDialog;
 
     QMenu*   SystemTrayMenu;
     QFuture<void> future;
@@ -55,9 +57,13 @@ protected:
 
 private slots:
     void TrayIcoClick(QSystemTrayIcon::ActivationReason Reason);
+    void ShowOrHideForm();
+    void ShowAboutVikingOneWindow();
+    void Exit();
+
     void onUploadFirmware();
     void NeedUpdate(QString AppFile, QString ReleaseNotes);    
-    void Exit();
+
 
     /* Bootloader event */
     void setConnected(bool enable);

@@ -24,7 +24,8 @@ HEADERS += \
     ../HIDBootloader/Comm.h \
     ../HIDBootloader/DeviceData.h \
     ../HIDBootloader/Device.h \
-    ../HIDBootloader/ImportExportHex.h
+    ../HIDBootloader/ImportExportHex.h \
+    aboutappdialog.h
 
 SOURCES += \
     main.cpp\
@@ -35,11 +36,13 @@ SOURCES += \
     ../HIDBootloader/Comm.cpp \
     ../HIDBootloader/DeviceData.cpp \
     ../HIDBootloader/Device.cpp \
-    ../HIDBootloader/ImportExportHex.cpp
+    ../HIDBootloader/ImportExportHex.cpp \
+    aboutappdialog.cpp
 
 FORMS += \
     mainwindow.ui \
-    updateavailabledialog.ui
+    updateavailabledialog.ui \
+    aboutappdialog.ui
 
 OTHER_FILES +=
 
