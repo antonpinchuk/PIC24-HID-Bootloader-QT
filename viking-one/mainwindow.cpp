@@ -21,10 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
     UpdateScheduler       = new TUpdateScheduler(this);
     SystemTrayMenu        = new QMenu("tray menu");
 
-
-    checkUpdateAction = SystemTrayMenu->addAction("Check for updates");
-    checkUploadFirmware = SystemTrayMenu->addAction("Upload firmware");
-    quitAction = SystemTrayMenu->addAction("Exit");
+    ShowHideAction       = SystemTrayMenu->addAction("Read/write rune pack");
+    checkUpdateAction    = SystemTrayMenu->addAction("Check for updates");
+    checkUploadFirmware  = SystemTrayMenu->addAction("Upload firmware");
+    aboutVikingOneAction = SystemTrayMenu->addAction("About VikingOne");
+    quitAction           = SystemTrayMenu->addAction("Exit");
 
     connect(quitAction, SIGNAL(triggered()), this, SLOT(Exit()) );
     connect(checkUpdateAction, SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
@@ -37,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(Ico , SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT  (TrayIcoClick(QSystemTrayIcon::ActivationReason)) );
-
 
     connect( ui->CheckVersionBtn , SIGNAL(clicked()), UpdateScheduler, SLOT(CheckUpdate()) );
     connect( UpdateScheduler, SIGNAL(NeedUpdate(QString,QString)), this, SLOT(NeedUpdate(QString,QString)) );

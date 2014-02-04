@@ -42,8 +42,10 @@ private:
     QMenu*   SystemTrayMenu;
     QFuture<void> future;
 
+    QAction* ShowHideAction;
     QAction* checkUpdateAction;
     QAction* checkUploadFirmware;
+    QAction* aboutVikingOneAction;
     QAction* quitAction;
 
     void uploadFirmware(unsigned char range);
