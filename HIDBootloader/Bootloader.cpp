@@ -969,16 +969,21 @@ HexImporter::ErrorCode Bootloader::LoadFile(QString newFileName)
 void Bootloader::SaveFile(QString fileName)
 {
     QFile binFile(fileName);
+    unsigned int bytesPerWord;
+    unsigned int bytesPerAddress;
+    Comm::ErrorCode result;
 
     if (!binFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         log("Can not open the file to write...");
         return ;
     }
 
-    QByteArray byteWriteArray;
     DeviceData::MemoryRange deviceRange;
 
     log("Write memory range to file...");
+
+
+
 
     for (int k = 0; k < deviceData->ranges.size(); k++)
     {
@@ -988,28 +993,38 @@ void Bootloader::SaveFile(QString fileName)
             continue; // Process single range only if selected
         }
 
-        if(deviceRange.type == PROGRAM_MEMORY)
-        {
+        if(deviceRange.type == PROGRAM_MEMORY){
             if (!writeFlash) {
                 continue;
             }
+            bytesPerAddress = device->bytesPerAddressFLASH;
+            bytesPerWord = device->bytesPerWordFLASH;
         }
         else if(deviceRange.type == EEPROM_MEMORY)
         {
             if (!writeEeprom) {
                 continue;
             }
+            bytesPerAddress = device->bytesPerAddressEEPROM;
+            bytesPerWord = device->bytesPerWordEEPROM;
         }
         else if(deviceRange.type == CONFIG_MEMORY)
         {
             if (!writeConfig) {
                 continue;
             }
+            bytesPerAddress = device->bytesPerAddressConfig;
+            bytesPerWord = device->bytesPerWordConfig;
         }
 
-        byteWriteArray.clear();
-        byteWriteArray.insert(0,(char *)deviceRange.pDataBuffer,deviceRange.dataBufferLength);
-        binFile.write(byteWriteArray);
+        for(unsigned int i = deviceRange.start; i < deviceRange.end; i++) {
+            for(unsigned int j = 0; j < bytesPerAddress; j++) {
+                unsigned int index = ((i - deviceRange.start) * bytesPerAddress)+j;
+            }
+        }
+
+        binFile.write((char*)deviceRange.pDataBuffer, deviceRange.dataBufferLength);
+
 
     }
     log("Write file complete...");
