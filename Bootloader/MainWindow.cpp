@@ -68,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     bootloader = new Bootloader();
 
+    bootloader->comm->protectionPassword = QString(BOOTLOADER_PROTECTION_PASSWORD).toLatin1();
+
     connect(bootloader, SIGNAL(setConnected(bool)), this, SLOT(setConnected(bool)));
     connect(bootloader, SIGNAL(setBootloadEnabled(bool)), this, SLOT(setBootloadEnabled(bool)));
     connect(bootloader, SIGNAL(setBootloadBusy(bool)), this, SLOT(setBootloadBusy(bool)));

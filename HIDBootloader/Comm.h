@@ -85,6 +85,7 @@ public:
     ~Comm();
 
     static const int SyncWaitTime;
+    QByteArray protectionPassword;
 
     enum ErrorCode
     {
@@ -154,7 +155,6 @@ public:
     };
 
 
-
     struct WritePacket
     {
         unsigned char report;
@@ -164,7 +164,14 @@ public:
             unsigned char LockedValue;
         };
         unsigned char bytesPerPacket;
-        unsigned char data[58];
+        union {
+            unsigned char data[58];
+            struct {
+                unsigned char pad1[42];
+                unsigned char protectionPassword[8];
+                unsigned char pad2[8];
+            }BootInfo;
+        };
     };
     struct ReadPacket
     {

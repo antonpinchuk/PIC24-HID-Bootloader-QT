@@ -47,7 +47,10 @@ namespace Ui
     class MainWindowClass;
 }
 
-#define MAX_RECENT_FILES 3
+//#define BOOTLOADER_PROTECTION_PASSWORD { 0x45, 0x3A, 0xAE, 0x4D, 0xCE, 0xEB, 0xD8, 0x43 }
+#define BOOTLOADER_PROTECTION_PASSWORD "E:®MÎëØC"
+
+#define MAX_RECENT_FILES 10
 
 /*!
  * The main Serial Bootloader GUI window.

@@ -43,6 +43,7 @@ Comm::Comm()
 {
     connected = false;
     boot_device = NULL;
+    protectionPassword = "";
 }
 
 /**
@@ -540,6 +541,7 @@ Comm::ErrorCode Comm::ReadBootloaderInfo(BootInfo* bootInfo)
     {
         memset((void*)&sendPacket, 0x00, sizeof(sendPacket));
         sendPacket.command = QUERY_DEVICE;
+        memcpy(&sendPacket.BootInfo.protectionPassword, protectionPassword.data(), 8);
 
         elapsed.start();
 
