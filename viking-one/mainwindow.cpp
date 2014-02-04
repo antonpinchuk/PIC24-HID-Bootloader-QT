@@ -56,8 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bootloader, SIGNAL(setProgressBar(int)), this, SLOT(updateProgressBar(int)));
     connect(bootloader, SIGNAL(message(Bootloader::MessageType, QString)), this, SLOT(onMessage(Bootloader::MessageType, QString)));
     connect(bootloader, SIGNAL(messageClear()), this, SLOT(onMessageClear()));
-    connect(bootloader, SIGNAL(ReadComplite()), this, SLOT(onReadComplete()));
-    connect(bootloader, SIGNAL(WriteComplite()), this, SLOT(onWriteComplete()));
+    connect(bootloader, SIGNAL(ReadComplete()), this, SLOT(onReadComplete()));
+    connect(bootloader, SIGNAL(WriteComplete()), this, SLOT(onWriteComplete()));
 
     setConnected(false);
     setBootloadEnabled(false);
