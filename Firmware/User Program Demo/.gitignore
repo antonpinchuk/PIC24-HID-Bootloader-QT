@@ -1,0 +1,5 @@
+﻿build
+dist
+nbproject/private/private.xml
+nbproject/Makefile-genesis.properties
+nbproject/*.mk
