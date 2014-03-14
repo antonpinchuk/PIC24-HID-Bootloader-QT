@@ -184,6 +184,8 @@ void WriteFlashSubBlock(void);
 void BootApplication(void);
 DWORD ReadProgramMemory(DWORD);
 
+volatile BYTE ReadPOT(void);
+
 /** T Y P E  D E F I N I T I O N S ************************************/
 
 typedef union __attribute__ ((packed)) _USB_HID_BOOTLOADER_COMMAND
@@ -277,8 +279,11 @@ void main(void)
 int main(void)
 #endif
 {   
-    mInitSwitch2();
-    if((sw2==1) && ((RCON & 0x83) != 0))
+//    mInitSwitch2();
+//    if((sw2==1) && ((RCON & 0x83) != 0))
+    mInitPOT();
+    // Run user program if potentiometer is turned clockwise
+    if (ReadPOT() < 50)
     {
         __asm__("goto 0x1400");
     }
@@ -1284,6 +1289,159 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
     }      
     return TRUE; 
 }
+
+
+/****************************************************************************
+  Function:
+    BYTE ReadPOT(void)
+
+  Summary:
+    Reads the pot value and returns the percentage of full scale (0-100)
+
+  Description:
+    Reads the pot value and returns the percentage of full scale (0-100)
+
+  Precondition:
+    A/D is initialized properly
+
+  Parameters:
+    None
+
+  Return Values:
+    None
+
+  Remarks:
+    None
+ ***************************************************************************/
+volatile BYTE ReadPOT(void) {
+    volatile WORD_VAL w;
+    volatile DWORD temp;
+
+#if defined(__18CXX)
+    mInitPOT();
+
+    ADCON0bits.GO = 1; // Start AD conversion
+    while (ADCON0bits.NOT_DONE); // Wait for conversion
+
+    w.v[0] = ADRESL;
+    w.v[1] = ADRESH;
+
+#elif defined(__C30__) || defined(__C32__) || defined __XC16__
+#if defined(PIC24FJ256GB110_PIM) || \
+            defined(PIC24FJ256DA210_DEV_BOARD) || \
+            defined(PIC24FJ256GB210_PIM)
+
+    AD1CHS = 0x5; //MUXA uses AN5
+
+    // Get an ADC sample
+    AD1CON1bits.SAMP = 1; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    AD1CON1bits.SAMP = 0; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    while (!AD1CON1bits.DONE); //Wait for conversion to complete
+
+    temp = (DWORD) ADC1BUF0;
+    temp = temp * 100;
+    temp = temp / 1023;
+
+#elif defined(PIC24F_ADK_FOR_ANDROID)
+    AD1CHS = 0x9; //MUXA uses AN9
+
+    // Get an ADC sample
+    AD1CON1bits.SAMP = 1; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    AD1CON1bits.SAMP = 0; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    while (!AD1CON1bits.DONE); //Wait for conversion to complete
+
+    temp = (DWORD) ADC1BUF0;
+    temp = temp * 100;
+    temp = temp / 1023;
+
+#elif defined(PIC24FJ64GB004_PIM) || defined(PIC24FJ64GB502_MICROSTICK)
+    AD1CHS = 0x7; //MUXA uses AN7
+
+    // Get an ADC sample
+    AD1CON1bits.SAMP = 1; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    AD1CON1bits.SAMP = 0; //Start sampling
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    while (!AD1CON1bits.DONE); //Wait for conversion to complete
+
+    temp = (DWORD) ADC1BUF0;
+    temp = temp * 100;
+    temp = temp / 1023;
+
+#elif defined(PIC24F_STARTER_KIT)
+    AD1CHS = 0x0; //MUXA uses AN0
+
+    // Get an ADC sample
+    AD1CON1bits.SAMP = 1; //Start sampling
+    for (w.Val = 0; w.Val < 5000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    AD1CON1bits.SAMP = 0; //Start sampling
+    for (w.Val = 0; w.Val < 5000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    while (!AD1CON1bits.DONE); //Wait for conversion to complete
+
+    temp = (DWORD) ADC1BUF0;
+    temp = temp * 100;
+    temp = temp / 1023;
+
+#elif defined(PIC32MX460F512L_PIM) || defined(PIC32MX795F512L_PIM)
+    AD1PCFG = 0xFFFB; // PORTB = Digital; RB2 = analog
+    AD1CON1 = 0x0000; // SAMP bit = 0 ends sampling ...
+    // and starts converting
+    AD1CHS = 0x00020000; // Connect RB2/AN2 as CH0 input ..
+    // in this example RB2/AN2 is the input
+    AD1CSSL = 0;
+    AD1CON3 = 0x0002; // Manual Sample, Tad = internal 6 TPB
+    AD1CON2 = 0;
+    AD1CON1SET = 0x8000; // turn ADC ON
+
+    AD1CON1SET = 0x0002; // start sampling ...
+    for (w.Val = 0; w.Val < 1000; w.Val++) {
+        Nop();
+    } //Sample delay, conversion start automatically
+    AD1CON1CLR = 0x0002; // start Converting
+    while (!(AD1CON1 & 0x0001)); // conversion done?
+
+    temp = (DWORD) ADC1BUF0;
+    temp = temp * 100;
+    temp = temp / 1023;
+
+#elif   defined(PIC32_USB_STARTER_KIT) || \
+                defined (DSPIC33E_USB_STARTER_KIT) || \
+                defined(PIC32_ETHERNET_STARTER_KIT) || \
+                defined(DSPIC33EP512MU810_PIM) || \
+                defined (PIC24EP512GU810_PIM) || \
+                defined (DSPIC33E_USB_STARTER_KIT) || \
+                defined (CEREBOT_32MX7)
+    //Doesn't have a Pot
+    w.Val = 50;
+    temp = 50;
+#else
+#error
+#endif
+
+#endif
+
+    return (BYTE) temp;
+}//end ReadPOT
 
 
 /** EOF main.c *************************************************/
