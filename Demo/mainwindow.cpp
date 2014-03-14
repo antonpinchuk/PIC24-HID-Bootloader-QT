@@ -96,7 +96,8 @@ void MainWindow::onMessageClear() {
 }
 
 void MainWindow::onReadComplete() {
-
+    // Save file uppon read completion
+    bootloader->SaveFile(fileName);
 }
 
 void MainWindow::onWriteComplete() {
@@ -113,17 +114,16 @@ void MainWindow::on_WriteDeviceBtn_clicked() {
 }
 
 void MainWindow::writeDevice(unsigned char range) {
-    QString newFileName;
     HexImporter::ErrorCode result;
     onMessageClear();
 
-    newFileName = QFileDialog::getOpenFileName(this, "Open Hex File", fileName, "Hex Files (*.hex *.ehx)");
-    if (newFileName.isEmpty()) {
+    fileName = QFileDialog::getOpenFileName(this, "Open Hex File", fileName, "Hex Files (*.hex *.ehx)");
+    if (fileName.isEmpty()) {
         return;
     }
 
     QApplication::setOverrideCursor(Qt::BusyCursor);
-    result = bootloader->LoadFile(newFileName);
+    result = bootloader->LoadFile(fileName);
     QApplication::restoreOverrideCursor();
 
     if (result == HexImporter::Success) {
@@ -141,9 +141,15 @@ void MainWindow::on_ReadDeviceBtn_clicked() {
     readDevice(MEMORY_RANGE_PROGRAM);
 }
 
-void MainWindow::readDevice(unsigned char range)
-{
+void MainWindow::readDevice(unsigned char range) {
+    fileName =
+        QFileDialog::getSaveFileName(this, "Save Binary File", "DeviceProgramMemoryDump.bin", "Binary Files (*.bin)");
+    if (fileName.isEmpty()) {
+        return;
+    }
 
+    bootloader->rangeReadWrite = range;
+    future = QtConcurrent::run(bootloader, &Bootloader::ReadDevice);
 }
 
 void MainWindow::on_AboutButton_clicked() {
