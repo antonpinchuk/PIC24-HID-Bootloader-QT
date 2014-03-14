@@ -1,7 +1,0 @@
-RewriteEngine On
-
-RewriteCond %{REQUEST_URI} ^\/downloads\/xbox-one\/berserker\/([\w\-\_]+)$ [OR]
-RewriteCond %{REQUEST_URI} ^\/([\w\-\_]+)$
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*) $1.php [QSA,L]
