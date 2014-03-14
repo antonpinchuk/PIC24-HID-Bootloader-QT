@@ -1,4 +1,4 @@
-PIC24-HID-Bootloader
+USB HID Bootloader for Microchip PIC24
 ====================
 Allows you integrate `USB HID Bootloader` into your QT software.
 
