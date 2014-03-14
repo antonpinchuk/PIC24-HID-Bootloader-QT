@@ -33,7 +33,7 @@
    <locale language="English" country="UnitedStates"/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="WriteRunePackBtn">
+   <widget class="QPushButton" name="WriteDeviceBtn">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -46,23 +46,23 @@
      </rect>
     </property>
     <property name="text">
-     <string>Write rune pack</string>
+     <string>Write device</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ReadRunePackBtn">
+   <widget class="QPushButton" name="ReadDeviceBtn">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>180</x>
       <y>20</y>
-      <width>160</width>
+      <width>151</width>
       <height>40</height>
      </rect>
     </property>
     <property name="text">
-     <string>Read rune pack</string>
+     <string>Read Device</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar">
@@ -87,7 +87,7 @@
    <widget class="QLabel" name="StatusLbl">
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>350</x>
       <y>30</y>
       <width>180</width>
       <height>20</height>
@@ -112,9 +112,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>140</y>
+      <y>129</y>
       <width>560</width>
-      <height>240</height>
+      <height>251</height>
      </rect>
     </property>
    </widget>
@@ -122,31 +122,31 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>120</y>
+      <y>110</y>
       <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <underline>true</underline>
+      <underline>false</underline>
      </font>
     </property>
     <property name="text">
-     <string>Show/Hide Debug Log</string>
+     <string>Debug Log</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="CheckVersionBtn">
+   <widget class="QPushButton" name="AboutButton">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>141</width>
-      <height>20</height>
+      <x>560</x>
+      <y>10</y>
+      <width>31</width>
+      <height>28</height>
      </rect>
     </property>
     <property name="text">
-     <string>Check Version</string>
+     <string>?</string>
     </property>
    </widget>
   </widget>

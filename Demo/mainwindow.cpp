@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#define MEMORY_RANGE_FIRMWARE 0
-#define MEMORY_RANGE_RUNEPACK 1
+#define MEMORY_RANGE_PROGRAM 0
+#define MEMORY_RANGE_EEPROM 1
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,42 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(this->minimumWidth(),this->minimumHeight());
-
-    ui->CheckVersionBtn->setVisible(false); // test check version button
+    this->setFixedSize(this->minimumWidth(), this->minimumHeight());
 
     QString VersionStr(APPLICATION_VERSION);
-    this->setWindowTitle("XBOX One Berserker Modded Controller Software - Version " + VersionStr);
+    this->setWindowTitle("PIC24 HID Bootloader - Integration Demo " + VersionStr);
 
-    updateAvailableDialog = new UpdateAvailableDialog(this); // 'this' non need?
-    aboutAppDialog        = new AboutAppDialog(this);
-
-    UpdateScheduler       = new TUpdateScheduler(this);
-    SystemTrayMenu        = new QMenu("tray menu");
-
-    ShowHideAction       = SystemTrayMenu->addAction("Hide window");
-    checkUpdateAction    = SystemTrayMenu->addAction("Check for updates");
-    checkUploadFirmware  = SystemTrayMenu->addAction("Upload firmware");
-    aboutVikingOneAction = SystemTrayMenu->addAction("About VikingOne");
-    quitAction           = SystemTrayMenu->addAction("Exit");
-
-    connect(ShowHideAction      , SIGNAL(triggered()), this           , SLOT(ShowOrHideForm()) );
-    connect(checkUpdateAction   , SIGNAL(triggered()), UpdateScheduler, SLOT(CheckUpdate()) );
-    connect(checkUploadFirmware , SIGNAL(triggered()), this           , SLOT(onUploadFirmware()) );
-    connect(aboutVikingOneAction, SIGNAL(triggered()), this           , SLOT(ShowAboutVikingOneWindow()) );
-    connect(quitAction          , SIGNAL(triggered()), this           , SLOT(Exit()) );
-
-    Ico = new QSystemTrayIcon(this);
-    Ico->setIcon(QIcon(":/new/ico/app.ico"));
-    Ico->setContextMenu(SystemTrayMenu);
-    Ico->show();
-
-    connect(Ico , SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-            this, SLOT  (TrayIcoClick(QSystemTrayIcon::ActivationReason)) );
-
-    connect( ui->CheckVersionBtn , SIGNAL(clicked()), UpdateScheduler, SLOT(CheckUpdate()) );
-    connect( UpdateScheduler, SIGNAL(NeedUpdate(QString,QString)), this, SLOT(NeedUpdate(QString,QString)) );
-
+    aboutAppDialog = new AboutAppDialog(this);
 
     /* Bootloader */
     bootloader = new Bootloader();
@@ -67,36 +37,13 @@ MainWindow::MainWindow(QWidget *parent) :
     setBootloadEnabled(false);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
-    delete Ico;
-    delete UpdateScheduler;
-    delete updateAvailableDialog;
-    delete SystemTrayMenu;
-}
-
-void MainWindow::changeEvent(QEvent* event)
-{
-    if(event->type() == QEvent::WindowStateChange) {
-        if(isMinimized()) {
-            this->hide();
-            event->ignore();
-        }
-    }
-    QMainWindow::changeEvent(event);
-}
-
-void MainWindow::TrayIcoClick(QSystemTrayIcon::ActivationReason Reason)
-{
-    if(Reason == QSystemTrayIcon::Trigger){
-        ShowOrHideForm();
-    }
+    delete aboutAppDialog;
 }
 
 
-void MainWindow::setConnected(bool connected)
-{
+void MainWindow::setConnected(bool connected) {
     if (connected) {
         ui->StatusLbl->setText("Status: Connected");
 
@@ -118,17 +65,12 @@ void MainWindow::setConnected(bool connected)
     }
 }
 
-void MainWindow::setBootloadEnabled(bool enable)
-{
-    ui->WriteRunePackBtn->setEnabled(enable);
-    ui->ReadRunePackBtn->setEnabled(enable);
-
-    /* System Tray*/
-    checkUploadFirmware->setEnabled(enable);
+void MainWindow::setBootloadEnabled(bool enable) {
+    ui->WriteDeviceBtn->setEnabled(enable);
+    ui->ReadDeviceBtn->setEnabled(enable);
 }
 
-void MainWindow::setBootloadBusy(bool busy)
-{
+void MainWindow::setBootloadBusy(bool busy) {
     if (busy) {
         QApplication::setOverrideCursor(Qt::BusyCursor);
     } else {
@@ -153,63 +95,24 @@ void MainWindow::onMessageClear() {
     ui->plainTextEdit->clear();
 }
 
-void MainWindow::onReadComplete()
-{
+void MainWindow::onReadComplete() {
 
 }
 
-void MainWindow::onWriteComplete()
-{
+void MainWindow::onWriteComplete() {
 
 }
-
 
 void MainWindow::updateProgressBar(int newValue) {
     ui->progressBar->setValue(newValue);
 }
 
-void MainWindow::NeedUpdate(QString AppFile, QString ReleaseNotes)
-{
-    updateAvailableDialog->ShowUpdateDialog(AppFile, ReleaseNotes);
+
+void MainWindow::on_WriteDeviceBtn_clicked() {
+    writeDevice(MEMORY_RANGE_PROGRAM);
 }
 
-void MainWindow::ShowOrHideForm()
-{
-    if(!this->isHidden()){
-        this->hide();
-        ShowHideAction->setText("Show window");
-        return;
-    }
-
-    ShowHideAction->setText("Hide window");
-    this->showNormal();
-    this->activateWindow();
-}
-
-void MainWindow::ShowAboutVikingOneWindow()
-{
-
-}
-
-void MainWindow::Exit()
-{
-    QCoreApplication::exit();
-}
-
-void MainWindow::onUploadFirmware()
-{
-    uploadFirmware(MEMORY_RANGE_RUNEPACK);
-}
-
-void MainWindow::on_WriteRunePackBtn_clicked()
-{
-    uploadFirmware(MEMORY_RANGE_FIRMWARE);
-}
-
-
-
-void MainWindow::uploadFirmware(unsigned char range)
-{
+void MainWindow::writeDevice(unsigned char range) {
     QString newFileName;
     HexImporter::ErrorCode result;
     onMessageClear();
@@ -233,3 +136,17 @@ void MainWindow::uploadFirmware(unsigned char range)
         future = QtConcurrent::run(bootloader, &Bootloader::WriteDevice);
     }
 }
+
+void MainWindow::on_ReadDeviceBtn_clicked() {
+    readDevice(MEMORY_RANGE_PROGRAM);
+}
+
+void MainWindow::readDevice(unsigned char range)
+{
+
+}
+
+void MainWindow::on_AboutButton_clicked() {
+    aboutAppDialog->open();
+}
+

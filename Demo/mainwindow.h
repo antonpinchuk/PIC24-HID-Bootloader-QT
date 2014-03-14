@@ -2,19 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSystemTrayIcon>
-#include <QIcon>
-#include <QMenu>
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include "updatescheduler.h"
-#include "updateavailabledialog.h"
-#include "aboutappdialog.h"
 #include "HIDBootloader/Bootloader.h"
+#include "aboutappdialog.h"
 
 namespace Ui {
     class MainWindow;
@@ -35,35 +30,14 @@ private:
 
     QString fileName;
 
-    QSystemTrayIcon  *Ico;
-    TUpdateScheduler *UpdateScheduler;
-
-    UpdateAvailableDialog *updateAvailableDialog;
     AboutAppDialog        *aboutAppDialog;
 
-    QMenu*   SystemTrayMenu;
     QFuture<void> future;
 
-    QAction* ShowHideAction;
-    QAction* checkUpdateAction;
-    QAction* checkUploadFirmware;
-    QAction* aboutVikingOneAction;
-    QAction* quitAction;
-
-    void uploadFirmware(unsigned char range);
-
-protected:
-     void changeEvent(QEvent* event);
+    void writeDevice(unsigned char range);
+    void readDevice(unsigned char range);
 
 private slots:
-    void TrayIcoClick(QSystemTrayIcon::ActivationReason Reason);
-    void ShowOrHideForm();
-    void ShowAboutVikingOneWindow();
-    void Exit();
-
-    void onUploadFirmware();
-    void NeedUpdate(QString AppFile, QString ReleaseNotes);    
-
 
     /* Bootloader event */
     void setConnected(bool enable);
@@ -72,11 +46,13 @@ private slots:
     void updateProgressBar(int newValue);
     void onMessage(Bootloader::MessageType type, QString value);
     void onMessageClear();
-
     void onReadComplete();
     void onWriteComplete();
 
-    void on_WriteRunePackBtn_clicked();
+    void on_WriteDeviceBtn_clicked();
+    void on_ReadDeviceBtn_clicked();
+
+    void on_AboutButton_clicked();
 };
 
 #endif // MAINWINDOW_H

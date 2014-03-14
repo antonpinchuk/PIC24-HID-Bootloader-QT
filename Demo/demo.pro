@@ -18,8 +18,6 @@ DEFINES += APPLICATION_VERSION=\"\\\"$$VERSION\\\"\"
 INCLUDEPATH += ../
 HEADERS += \
     mainwindow.h \
-    updatescheduler.h \
-    updateavailabledialog.h \
     ../HIDBootloader/Bootloader.h \
     ../HIDBootloader/Comm.h \
     ../HIDBootloader/DeviceData.h \
@@ -30,8 +28,6 @@ HEADERS += \
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
-    updatescheduler.cpp \
-    updateavailabledialog.cpp \
     ../HIDBootloader/Bootloader.cpp \
     ../HIDBootloader/Comm.cpp \
     ../HIDBootloader/DeviceData.cpp \
@@ -41,7 +37,6 @@ SOURCES += \
 
 FORMS += \
     mainwindow.ui \
-    updateavailabledialog.ui \
     aboutappdialog.ui
 
 OTHER_FILES +=
