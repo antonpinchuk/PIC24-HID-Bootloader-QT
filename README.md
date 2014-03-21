@@ -8,6 +8,8 @@ Our project is based on [Microchip Libraries for Applications ](http://www.micro
 
 We have refactored that project (split GUI and bootloader) to let your QT app operate with Microchip protocol using our shared classes. Also we extended bootloader with some useful functions like separate device read, write, verify, save to file, work with specified memory ranges etc.
 
+All the code related to Microchip bootloader protocol was kept untouched and compatible with original MLA demo. 
+
 Build project with QT Creator 5.2
 ---------------------------------
 1. Remove all *.pro.user files from all project subfolders
@@ -18,7 +20,7 @@ Build project with QT Creator 5.2
 
 Firmware
 --------
-We tested our project on [PIC24F Starter Kit](http://www.microchip.com/Developmenttools/ProductDetails.aspx?PartNO=DM240011) and custom PIC24FJ256GB106 device. Appropriate sources are attached in this repository. MLA package also contain sources for other MCU families. 
+We tested our project on [PIC24F Starter Kit](http://www.microchip.com/Developmenttools/ProductDetails.aspx?PartNO=DM240011) and custom PIC24FJ256GB106 device. Appropriate MCU sources are attached in this repository. Original MLA package also contain sources for other MCU families. 
 
 Testing the demo app with PIC24F Starter Kit
 --------------------------------------------
@@ -36,5 +38,4 @@ TODO
 ----
 1. Export memory dump to HEX format
 2. Customize Microchip protocol with stream encryption (AES or XTEA)
-
-
+3. Open source of Android USB accessory bootloader (contact us for details)
